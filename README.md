@@ -7,3 +7,4 @@ App per l'accettazione veicoli: dati auto e cliente, foto guidate, danni sul dis
 - Dati: Supabase `sd-officina`, tabelle `acc_users` e `acc_schede`, funzioni RPC `acc_*` protette da PIN
 - Foto: bucket privato `accettazione`, gestito dalla edge function `acc-foto`
 - Titolare: entra con lo stesso PIN del timbratore; operatori scelgono il PIN al primo accesso
+- Pubblicazione: ogni push su `main` viene pubblicato automaticamente da Vercel
