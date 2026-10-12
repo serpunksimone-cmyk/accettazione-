@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1318">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Accettazione S.D.Garage</title>
+<style>
+:root{color-scheme:dark;--bg:#0f1318;--card:#1a2029;--card2:#222a35;--tx:#f1f5f9;--mu:#aab4c3;--bd:#364050;--bd2:#5b6778;--ac:#fb923c;--ok:#22c55e;--ko:#ef4444;--wa:#f59e0b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg)}
+body{margin:0;color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.4;padding:calc(env(safe-area-inset-top,0px) + 12px) 16px calc(env(safe-area-inset-bottom,0px) + 96px);max-width:900px;margin-inline:auto}
+button{font-family:inherit;cursor:pointer;color:inherit}
+h1{font-size:1.4rem;margin:0}h2{font-size:1.15rem;margin:22px 0 10px}
+.mu{color:var(--mu)}.sm{font-size:.85rem}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.brand b{font-size:1.45rem;display:block;line-height:1.1}.brand small{color:var(--mu);font-size:.85rem}
+.card{background:var(--card);border:2px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+label{display:block;font-weight:700;margin:14px 0 6px;font-size:1rem}
+label:first-child{margin-top:0}
+input.f,textarea.f,select.f{width:100%;font-size:1.15rem;padding:13px;border:2px solid var(--bd2);border-radius:10px;background:var(--bg);color:var(--tx);font-family:inherit;min-height:52px}
+textarea.f{min-height:96px;resize:vertical}
+input.f:focus,textarea.f:focus{outline:3px solid var(--ac);border-color:var(--ac)}
+input.targa{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:800;letter-spacing:.14em;text-transform:uppercase;text-align:center;font-size:1.5rem}
+::placeholder{color:#7c8798;opacity:1;letter-spacing:normal;font-weight:400}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row>div{min-width:0}
+.b{display:block;width:100%;padding:15px;font-size:1.15rem;font-weight:800;border:0;border-radius:12px;background:var(--ok);color:#04210f;min-height:58px}
+.b.ac{background:var(--ac);color:#1a0a02}.b.gh{background:transparent;border:2px solid var(--bd2);color:var(--tx)}.b.ko{background:var(--ko);color:#1a0505}
+.b:disabled{opacity:.5}
+.btn{padding:10px 14px;border:2px solid var(--bd2);border-radius:10px;background:transparent;font-weight:700;font-size:.95rem}
+.btn.del{color:#f87171;border-color:#f87171}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:11px 15px;border:2px solid var(--bd2);border-radius:99px;background:var(--bg);font-size:1rem;font-weight:700}
+.chip.sel{background:var(--ac);border-color:var(--ac);color:#1a0a02}
+.seg{display:flex;border:2px solid var(--bd2);border-radius:10px;overflow:hidden}
+.seg button{flex:1;padding:13px 4px;border:0;background:var(--bg);font-weight:700;font-size:.95rem;border-left:1px solid var(--bd)}
+.seg button:first-child{border-left:0}.seg button.sel{background:var(--ac);color:#1a0a02}
+.msg{color:#f87171;font-weight:700;min-height:1.3em;margin-top:8px}
+.ok-t{color:var(--ok)}
+/* lista */
+.it{display:flex;gap:12px;align-items:center;background:var(--card);border:2px solid var(--bd);border-left:8px solid var(--bd2);border-radius:14px;padding:10px;margin-bottom:10px;width:100%;text-align:left}
+.it.chiusa{border-left-color:var(--ok)}.it.bozza{border-left-color:var(--wa)}
+.it .th{width:74px;height:74px;border-radius:10px;background:var(--bg) center/cover no-repeat;flex:none;display:grid;place-items:center;color:var(--mu);font-size:1.6rem}
+.it .tg{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:800;font-size:1.2rem;letter-spacing:.08em}
+.pill{display:inline-block;font-size:.75rem;font-weight:800;padding:3px 9px;border-radius:99px;background:var(--bd);color:#e2e8f0;vertical-align:middle}
+.pill.chiusa{background:var(--ok);color:#04210f}.pill.bozza{background:var(--wa);color:#1f1300}
+/* scheda */
+.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0 10px;margin-top:-8px}
+.tb{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#sv{font-size:.85rem;color:var(--mu);white-space:nowrap}
+.steps{display:flex;gap:6px;margin-top:10px;overflow-x:auto;scrollbar-width:none}
+.steps button{flex:1 0 auto;padding:10px 12px;border:2px solid var(--bd);border-radius:10px;background:var(--card);font-weight:700;font-size:.9rem;white-space:nowrap}
+.steps button.sel{border-color:var(--ac);background:var(--ac);color:#1a0a02}
+.steps button .n{opacity:.7;margin-right:4px}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:6;background:rgba(15,19,24,.96);border-top:1px solid var(--bd);padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 10px)}
+.bar .in{max-width:900px;margin:0 auto;display:flex;gap:10px}.bar .b{min-height:54px}
+.hist{background:#132235;border:2px solid #2f4b6e;border-radius:12px;padding:12px;margin-top:12px;font-size:.95rem}
+.hist b{color:#93c5fd}.warn{background:#33260a;border-color:var(--wa);color:#fde68a}
+/* foto */
+.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.ft{position:relative;aspect-ratio:4/3;border:2px dashed var(--bd2);border-radius:12px;background:var(--card) center/cover no-repeat;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px;text-align:center;font-weight:700;font-size:.95rem}
+.ft.has{border-style:solid;border-color:var(--ok)}
+.ft.has .lb{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);padding:5px;border-radius:0 0 10px 10px;font-size:.85rem}
+.ft .ic{font-size:1.9rem;line-height:1}
+.ft .cnt{position:absolute;top:6px;right:6px;background:var(--ok);color:#04210f;border-radius:99px;padding:1px 8px;font-size:.8rem;font-weight:800}
+.ft.up{border-color:var(--ac)}
+.spin{width:28px;height:28px;border:4px solid var(--bd2);border-top-color:var(--ac);border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* danni */
+.carw{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+#car{width:min(100%,260px);touch-action:manipulation;user-select:none;display:block;margin:0 auto;background:var(--card);border:2px solid var(--bd);border-radius:14px}
+.dl{flex:1;min-width:240px}
+.dn{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:2px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:8px;width:100%;text-align:left}
+.dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#111;flex:none}
+/* checklist */
+.ck{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.ck:last-child{border-bottom:0}.ck .nm{font-weight:700;flex:1 1 180px}
+.ck .seg{flex:0 0 auto}.ck .seg button{padding:10px 12px;min-width:62px}
+.ck .seg button.s-ok.sel{background:var(--ok);color:#04210f}.ck .seg button.s-ko.sel{background:var(--ko);color:#1a0505}.ck .seg button.s-nc.sel{background:var(--bd2);color:#fff}
+.ck input.f{flex:1 1 100%;min-height:44px;font-size:1rem;padding:9px}
+/* firma */
+#sig{width:100%;height:220px;background:#fff;border-radius:12px;touch-action:none;display:block}
+.sum{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:1rem}.sum dt{color:var(--mu)}.sum dd{margin:0;font-weight:700}
+/* overlay */
+.ov{position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.85);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--card);width:100%;max-width:640px;border-radius:18px 18px 0 0;padding:18px 16px calc(env(safe-area-inset-bottom,0px) + 18px);max-height:92vh;overflow:auto}
+.ov.full{align-items:center;flex-direction:column;gap:10px;padding:12px}
+.ov.full img{max-width:100%;max-height:78vh;border-radius:10px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:110px;background:#111827;border:2px solid var(--bd2);padding:10px 16px;border-radius:12px;z-index:30;font-weight:700;max-width:90vw}
+.toast.err{border-color:var(--ko);color:#fecaca}
+.pin{letter-spacing:.4em;text-align:center;font-size:1.6rem}
+#print{display:none}
+@media print{
+  body{background:#fff;color:#000;padding:0;max-width:none;font-size:11pt}
+  #app,.bar,.ov,.toast{display:none!important}
+  #print{display:block}
+  #print h1{font-size:18pt;margin:0 0 2px}#print h3{font-size:12pt;margin:14px 0 6px;border-bottom:1px solid #999}
+  #print table{width:100%;border-collapse:collapse}#print td{padding:3px 6px;vertical-align:top;border-bottom:1px solid #ddd}
+  #print .pg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}#print .pg img{width:100%;height:150px;object-fit:cover}
+  #print .pg div{font-size:8pt;break-inside:avoid}
+  #print svg{width:200px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="print"></div>
+<input type="file" id="cam" accept="image/*" capture="environment" hidden>
+<input type="file" id="gal" accept="image/*" multiple hidden>
+<script>
+"use strict";
+var API="https://mwkobzsyomdrokuhiztr.supabase.co";
+var KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13a29ienN5b21kcm9rdWhpenRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4Mjk2NzQsImV4cCI6MjEwNzQwNTY3NH0.A9hM2sDLbhtauY3IxkgnQPv1X6r-dmn_Ypco7WyForM";
+var FN=API+"/functions/v1/acc-foto";
+
+var SLOTS=[["fronte","Fronte"],["retro","Retro"],["sx","Lato sinistro"],["dx","Lato destro"],["ant_sx","3/4 anteriore"],["post_dx","3/4 posteriore"],["cruscotto","Cruscotto (km e spie)"],["interni","Interni"],["bagagliaio","Bagagliaio"],["ruote","Cerchi / gomme"]];
+var TIPI=[["graffio","Graffio","#facc15"],["ammaccatura","Ammaccatura","#fb923c"],["rottura","Rotto / crepato","#ef4444"],["vite","Vite / fissaggio","#c084fc"],["specchietto","Specchietto","#60a5fa"],["vetro","Vetro","#22d3ee"],["ruggine","Ruggine","#b45309"],["altro","Altro","#9ca3af"]];
+var CK=[["carrozzeria","Carrozzeria"],["paraurti","Paraurti"],["specchietti","Specchietti"],["fari","Fari e frecce"],["vetri","Parabrezza e vetri"],["tergi","Tergicristalli"],["cerchi","Cerchi"],["gomme","Pneumatici"],["viti","Viti e fissaggi (carter, paraurti, targhe)"],["interni","Interni e sedili"],["spie","Spie cruscotto spente"],["ruotino","Ruotino / kit gonfiaggio"]];
+var CARB=["Riserva","1/4","1/2","3/4","Pieno"];
+var STEPS=["Veicolo","Foto","Danni","Controlli","Firma"];
+
+var S={u:null,p:null,nome:null};
+var D=null,STEP=0,URLS={},SAVE_T=null,SAVING=null,DIRTY=false,HIST=null,UPS=0,Q="",SLOT_PICK=null;
+
+function h(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function $(id){return document.getElementById(id)}
+function tipo(k){for(var i=0;i<TIPI.length;i++)if(TIPI[i][0]===k)return TIPI[i];return TIPI[TIPI.length-1]}
+function dt(s,ora){if(!s)return"";var d=new Date(s);return d.toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit",year:"numeric"})+(ora===false?"":" "+d.toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}))}
+function toast(t,err){var o=document.createElement("div");o.className="toast"+(err?" err":"");o.textContent=t;document.body.appendChild(o);setTimeout(function(){o.remove()},err?4000:2200)}
+function store(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function load(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
+
+function rpc(fn,a){
+  return fetch(API+"/rest/v1/rpc/"+fn,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify(a||{})})
+  .then(function(r){return r.text().then(function(t){var j=null;try{j=t?JSON.parse(t):null}catch(e){}
+    if(!r.ok)throw new Error((j&&(j.message||j.error))||("Errore "+r.status));return j})})
+  .catch(function(e){if(e instanceof TypeError)throw new Error("Connessione assente");throw e});
+}
+function A(o){var x={p_u:S.u,p_p:S.p};for(var k in o)x[k]=o[k];return x}
+function fx(body,isForm){
+  var hd={apikey:KEY,Authorization:"Bearer "+KEY};if(!isForm)hd["Content-Type"]="application/json";
+  return fetch(FN,{method:"POST",headers:hd,body:isForm?body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){if(!r.ok||j.error)throw new Error(j.error||("Errore "+r.status));return j})});
+}
+function sign(paths){
+  paths=paths.filter(function(p){return p&&!URLS[p]});
+  if(!paths.length)return Promise.resolve();
+  return fx({a:"urls",u:S.u,p:S.p,paths:paths}).then(function(r){for(var k in r.urls)URLS[k]=r.urls[k]});
+}
+
+/* ---------- accesso ---------- */
+function viewLogin(sel,first){
+  var app=$("app");
+  app.innerHTML='<header><div class="brand"><b>Accettazione</b><small>S.D.Garage</small></div></header><div class="card" id="lc"><div class="mu">Caricamento…</div></div>';
+  rpc("acc_users_list").then(function(us){
+    var c=$("lc");
+    var html='<label>Chi sei?</label><div class="chips">'+us.map(function(u){return'<button class="chip'+(sel&&sel.id===u.id?" sel":"")+'" data-u="'+u.id+'">'+h(u.nome)+'</button>'}).join("")+
+      '<button class="chip'+(sel&&sel.id===0?" sel":"")+'" data-u="0">Titolare</button></div>';
+    if(sel){
+      var u=sel.id===0?{id:0,nome:"Titolare",set:true}:us.filter(function(x){return x.id===sel.id})[0];
+      if(u&&!u.set){
+        html+='<label>Primo accesso: scegli il tuo PIN (4-6 cifre)</label><input class="f pin" id="p1" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">'+
+          '<label>Ripeti il PIN</label><input class="f pin" id="p2" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">'+
+          '<div style="margin-top:14px"><button class="b" id="go" data-first="1">Imposta PIN ed entra</button></div>';
+      }else{
+        html+='<label>PIN '+(sel.id===0?"titolare (lo stesso del timbratore)":"di "+h(u?u.nome:""))+'</label><input class="f pin" id="p1" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">'+
+          '<div style="margin-top:14px"><button class="b" id="go">Entra</button></div>';
+      }
+    }
+    html+='<div class="msg" id="lm"></div>';
+    c.innerHTML=html;
+    var p1=$("p1");if(p1){p1.focus();p1.addEventListener("keydown",function(e){if(e.key==="Enter")$("go").click()})}
+    c.onclick=function(e){
+      var b=e.target.closest("[data-u]");if(b){viewLogin({id:+b.dataset.u});return}
+      if(e.target.id!=="go")return;
+      var pin=$("p1").value.trim(),m=$("lm");m.textContent="";
+      var go=function(){return rpc("acc_login",{p_u:sel.id,p_p:pin}).then(function(n){S={u:sel.id,p:pin,nome:n};store("acc_s",S);viewList()})};
+      if(e.target.dataset.first){
+        if(!/^\d{4,6}$/.test(pin)){m.textContent="Il PIN deve avere 4-6 cifre";return}
+        if(pin!==$("p2").value.trim()){m.textContent="I due PIN non coincidono";return}
+        rpc("acc_set_pin",{p_u:sel.id,p_old:"",p_new:pin}).then(go).catch(function(x){m.textContent=x.message});
+      }else go().catch(function(x){m.textContent=x.message});
+    };
+  }).catch(function(e){$("lc").innerHTML='<div class="msg">'+h(e.message)+'</div><button class="b gh" onclick="viewLogin()">Riprova</button>'});
+}
+function logout(){store("acc_s",null);S={u:null,p:null,nome:null};D=null;viewLogin()}
+function authFail(e){if(/PIN/.test(e.message)){toast("Sessione scaduta: rientra",true);logout();return true}return false}
+
+/* ---------- elenco ---------- */
+function viewList(){
+  D=null;HIST=null;window.scrollTo(0,0);
+  $("app").innerHTML='<header><div class="brand"><b>Accettazione</b><small>S.D.Garage · '+h(S.nome)+'</small></div>'+
+    '<div style="display:flex;gap:8px">'+(S.u===0?'<button class="btn" id="adm">Operatori</button>':'')+'<button class="btn" id="out">Esci</button></div></header>'+
+    '<button class="b ac" id="nw" style="font-size:1.25rem">＋ Nuova accettazione</button>'+
+    '<div style="margin:16px 0 12px"><input class="f" id="q" placeholder="Cerca targa, cliente o modello" value="'+h(Q)+'"></div>'+
+    '<div id="ls"><div class="mu">Caricamento…</div></div>';
+  $("out").onclick=logout;
+  if($("adm"))$("adm").onclick=viewAdmin;
+  $("nw").onclick=function(){this.disabled=true;rpc("acc_new",A({})).then(function(id){openScheda(id,0)}).catch(function(e){if(!authFail(e))toast(e.message,true);$("nw").disabled=false})};
+  var t;$("q").oninput=function(){Q=this.value.trim();clearTimeout(t);t=setTimeout(fillList,300)};
+  fillList();
+}
+function fillList(){
+  rpc("acc_list",A({p_q:Q})).then(function(rs){
+    var el=$("ls");if(!el)return;
+    if(!rs.length){el.innerHTML='<div class="card mu">'+(Q?"Nessun risultato.":"Ancora nessuna accettazione. Tocca «Nuova accettazione» per iniziare.")+'</div>';return}
+    var draw=function(){el.innerHTML=rs.map(function(r){
+      var u=r.cover&&URLS[r.cover];
+      return'<button class="it '+h(r.stato)+'" data-id="'+r.id+'"><div class="th"'+(u?' style="background-image:url(\''+h(u)+'\')"':'')+'>'+(u?"":"🚗")+'</div><div style="min-width:0;flex:1">'+
+        '<div><span class="tg">'+h(r.targa||"— senza targa —")+'</span> <span class="pill '+h(r.stato)+'">'+(r.stato==="chiusa"?"Completa":"In corso")+'</span></div>'+
+        '<div>'+h([r.marca,r.modello].filter(Boolean).join(" "))+(r.cliente_nome?' · '+h(r.cliente_nome):'')+'</div>'+
+        '<div class="mu sm">N° '+r.num+' · '+dt(r.created_at)+' · '+r.nfoto+' foto · '+r.ndanni+' danni</div></div></button>'}).join("")};
+    draw();
+    sign(rs.map(function(r){return r.cover})).then(draw).catch(function(){});
+    el.onclick=function(e){var b=e.target.closest("[data-id]");if(b)openScheda(b.dataset.id,0)};
+  }).catch(function(e){if(!authFail(e)){var el=$("ls");if(el)el.innerHTML='<div class="msg">'+h(e.message)+'</div>'}});
+}
+
+/* ---------- operatori (titolare) ---------- */
+function viewAdmin(){
+  $("app").innerHTML='<header><button class="btn" id="bk">← Elenco</button><h1>Operatori</h1></header><div class="card" id="us">…</div>'+
+    '<div class="card"><label>Aggiungi operatore</label><input class="f" id="nn" placeholder="Nome"><div style="margin-top:10px"><button class="b" id="ad">Aggiungi</button></div>'+
+    '<p class="mu sm">Al primo accesso l\'operatore sceglie il proprio PIN. Il titolare entra con il PIN del timbratore.</p></div>';
+  $("bk").onclick=viewList;
+  var fill=function(){rpc("acc_users_list").then(function(us){
+    $("us").innerHTML=us.map(function(u){return'<div class="ck"><div class="nm">'+h(u.nome)+' <span class="mu sm">'+(u.set?"PIN impostato":"PIN da impostare")+'</span></div>'+
+      '<div style="display:flex;gap:8px"><button class="btn" data-r="'+u.id+'">Azzera PIN</button><button class="btn del" data-o="'+u.id+'">Disattiva</button></div></div>'}).join("")||'<span class="mu">Nessun operatore</span>';
+  })};
+  fill();
+  $("us").onclick=function(e){var t=e.target;
+    if(t.dataset.r&&confirm("Azzerare il PIN? Al prossimo accesso ne sceglierà uno nuovo."))rpc("acc_user_reset",{p_o:S.p,p_id:+t.dataset.r}).then(fill).catch(function(x){toast(x.message,true)});
+    if(t.dataset.o&&confirm("Disattivare questo operatore?"))rpc("acc_user_off",{p_o:S.p,p_id:+t.dataset.o}).then(fill).catch(function(x){toast(x.message,true)});
+  };
+  $("ad").onclick=function(){var n=$("nn").value.trim();if(!n)return;rpc("acc_user_add",{p_o:S.p,p_nome:n}).then(function(){$("nn").value="";fill()}).catch(function(x){toast(x.message,true)})};
+}
+
+/* ---------- scheda ---------- */
+function openScheda(id,step){
+  $("app").innerHTML='<div class="mu">Apertura scheda…</div>';
+  rpc("acc_get",A({p_id:id})).then(function(r){
+    D=r;D.checklist=D.checklist||{};D.danni=D.danni||[];D.foto=D.foto||[];STEP=step||0;HIST=null;
+    viewScheda();
+    sign(D.foto.map(function(f){return f.path})).then(function(){if(STEP===1||STEP===2)renderStep()}).catch(function(){});
+    if(D.targa)loadHist();
+  }).catch(function(e){if(!authFail(e)){toast(e.message,true);viewList()}});
+}
+function viewScheda(){
+  $("app").innerHTML='<div class="top"><div class="tb"><button class="btn" id="bk">← Elenco</button>'+
+    '<div style="text-align:center;min-width:0"><b id="ttl"></b><div id="sv"></div></div>'+
+    (S.u===0?'<button class="btn del" id="dl">Elimina</button>':'<span style="width:60px"></span>')+'</div>'+
+    '<div class="steps" id="st"></div></div><div id="body"></div>'+
+    '<div class="bar"><div class="in"><button class="b gh" id="pv" style="flex:1">‹ Indietro</button><button class="b ac" id="nx" style="flex:2">Avanti ›</button></div></div>';
+  $("bk").onclick=function(){flush().then(viewList)};
+  if($("dl"))$("dl").onclick=function(){if(!confirm("Eliminare definitivamente questa accettazione e tutte le sue foto?"))return;
+    fx({a:"purge",o:S.p,id:D.id}).then(function(){toast("Eliminata");viewList()}).catch(function(x){toast(x.message,true)})};
+  $("st").onclick=function(e){var b=e.target.closest("[data-s]");if(b)go(+b.dataset.s)};
+  $("pv").onclick=function(){if(STEP>0)go(STEP-1);else flush().then(viewList)};
+  $("nx").onclick=function(){if(STEP<STEPS.length-1)go(STEP+1);else flush().then(viewList)};
+  renderStep();
+}
+function head(){
+  $("ttl").textContent="N° "+D.num+(D.targa?" · "+D.targa:"");
+  $("st").innerHTML=STEPS.map(function(s,i){
+    var n=i===1?" ("+D.foto.length+")":i===2?" ("+D.danni.length+")":"";
+    return'<button data-s="'+i+'" class="'+(i===STEP?"sel":"")+'"><span class="n">'+(i+1)+'</span>'+s+n+'</button>'}).join("");
+  $("pv").textContent=STEP===0?"‹ Elenco":"‹ Indietro";
+  $("nx").textContent=STEP===STEPS.length-1?"Fine ✓":"Avanti ›";
+  setSv();
+}
+function setSv(){var e=$("sv");if(!e)return;e.textContent=UPS?"Invio foto… ("+UPS+")":SAVING||DIRTY?"Salvataggio…":D.stato==="chiusa"?"Completa ✓":"Salvato ✓"}
+function go(i){flush();STEP=i;window.scrollTo(0,0);renderStep()}
+function renderStep(){
+  if(!D||!$("body"))return;head();
+  [stepVeicolo,stepFoto,stepDanni,stepControlli,stepFirma][STEP]($("body"));
+}
+
+/* salvataggio automatico */
+function payload(){var o={};["targa","marca","modello","telaio","km","carburante","cliente_nome","cliente_tel","cliente_email","richiesta","oggetti","note","lavaggio","chiavi","riconsegna","checklist","danni"].forEach(function(k){o[k]=D[k]==null?"":D[k]});return o}
+function saveSoon(){DIRTY=true;setSv();clearTimeout(SAVE_T);SAVE_T=setTimeout(flush,700)}
+function flush(){
+  clearTimeout(SAVE_T);
+  if(!D||!DIRTY)return SAVING||Promise.resolve();
+  DIRTY=false;var id=D.id;
+  SAVING=(SAVING||Promise.resolve()).then(function(){return rpc("acc_save",A({p_id:id,p:payload()}))})
+    .catch(function(e){if(!authFail(e)){DIRTY=true;toast("Non salvato: "+e.message,true)}})
+    .then(function(){SAVING=null;setSv()});
+  setSv();return SAVING;
+}
+window.addEventListener("beforeunload",function(e){if(DIRTY||UPS){flush();e.preventDefault();e.returnValue=""}});
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="hidden")flush()});
+
+function bindFields(root){
+  root.querySelectorAll("[data-f]").forEach(function(el){
+    var k=el.dataset.f;
+    el.addEventListener(el.type==="checkbox"?"change":"input",function(){
+      var v=el.type==="checkbox"?el.checked:el.value;
+      if(k==="targa"){v=v.toUpperCase().replace(/\s+/g,"");el.value=v;$("ttl").textContent="N° "+D.num+(v?" · "+v:"")}
+      D[k]=v;saveSoon();
+      if(k==="targa"){clearTimeout(bindFields.t);bindFields.t=setTimeout(loadHist,600)}
+      if(k==="km")kmWarn();
+    });
+  });
+}
+
+/* --- 1 veicolo e cliente --- */
+function stepVeicolo(b){
+  b.innerHTML='<div class="card"><label>Targa</label><input class="f targa" data-f="targa" value="'+h(D.targa)+'" placeholder="AB123CD" autocomplete="off" autocapitalize="characters">'+
+    '<div id="hist"></div>'+
+    '<div class="row"><div><label>Marca</label><input class="f" data-f="marca" value="'+h(D.marca)+'" placeholder="Fiat"></div><div><label>Modello</label><input class="f" data-f="modello" value="'+h(D.modello)+'" placeholder="Panda"></div></div>'+
+    '<div class="row"><div><label>Km</label><input class="f" data-f="km" inputmode="numeric" value="'+h(D.km)+'" placeholder="123456"></div><div><label>Chiavi consegnate</label><div class="seg" id="chiavi">'+[1,2,3].map(function(n){return'<button data-v="'+n+'" class="'+(+D.chiavi===n?"sel":"")+'">'+n+'</button>'}).join("")+'</div></div></div>'+
+    '<div id="kmw"></div>'+
+    '<label>Carburante</label><div class="seg" id="carb">'+CARB.map(function(c,i){return'<button data-v="'+i+'" class="'+(D.carburante!=null&&+D.carburante===i?"sel":"")+'">'+c+'</button>'}).join("")+'</div>'+
+    '<label>Telaio (facoltativo)</label><input class="f" data-f="telaio" value="'+h(D.telaio)+'" placeholder="VIN" autocapitalize="characters"></div>'+
+    '<div class="card"><label>Cliente</label><input class="f" data-f="cliente_nome" value="'+h(D.cliente_nome)+'" placeholder="Nome e cognome" autocomplete="off">'+
+    '<div class="row"><div><label>Telefono</label><input class="f" data-f="cliente_tel" type="tel" value="'+h(D.cliente_tel)+'" placeholder="333 1234567"></div><div><label>Email</label><input class="f" data-f="cliente_email" type="email" value="'+h(D.cliente_email)+'" placeholder="facoltativa"></div></div></div>'+
+    '<div class="card"><label>Cosa chiede il cliente</label><textarea class="f" data-f="richiesta" placeholder="Es. tagliando, rumore anteriore in frenata, spia motore…">'+h(D.richiesta)+'</textarea>'+
+    '<label style="display:flex;align-items:center;gap:12px;font-size:1.1rem"><input type="checkbox" data-f="lavaggio" '+(D.lavaggio?"checked":"")+' style="width:28px;height:28px;accent-color:#fb923c"> Lavaggio richiesto</label>'+
+    '<label>Oggetti lasciati in auto</label><input class="f" data-f="oggetti" value="'+h(D.oggetti)+'" placeholder="Es. seggiolino, occhiali, documenti">'+
+    '<label>Riconsegna prevista</label><input class="f" data-f="riconsegna" type="date" value="'+h(D.riconsegna)+'">'+
+    '<label>Note interne</label><textarea class="f" data-f="note" placeholder="Note per l\'officina">'+h(D.note)+'</textarea></div>';
+  bindFields(b);
+  $("carb").onclick=function(e){var t=e.target.closest("[data-v]");if(!t)return;D.carburante=+t.dataset.v;this.querySelectorAll("button").forEach(function(x){x.classList.toggle("sel",x===t)});saveSoon()};
+  $("chiavi").onclick=function(e){var t=e.target.closest("[data-v]");if(!t)return;D.chiavi=+t.dataset.v;this.querySelectorAll("button").forEach(function(x){x.classList.toggle("sel",x===t)});saveSoon()};
+  drawHist();kmWarn();
+}
+function loadHist(){
+  var t=(D.targa||"").trim();
+  if(t.length<4){HIST=null;drawHist();return}
+  rpc("acc_storico",A({p_targa:t,p_esclude:D.id})).then(function(r){if(D&&D.targa===t){HIST=r;drawHist();kmWarn()}}).catch(function(){});
+}
+function lastKm(){
+  if(!HIST)return null;var m=null;
+  HIST.acc.concat(HIST.off).forEach(function(x){var k=parseInt(String(x.km||"").replace(/\D/g,""),10);if(k&&(m==null||k>m))m=k});return m;
+}
+function kmWarn(){
+  var el=$("kmw");if(!el)return;var lk=lastKm(),k=parseInt(String(D.km||"").replace(/\D/g,""),10);
+  el.innerHTML=lk&&k&&k<lk?'<div class="hist warn">⚠ Km inferiori all\'ultima registrazione ('+lk.toLocaleString("it-IT")+' km). Controlla il contachilometri.</div>':"";
+}
+function drawHist(){
+  var el=$("hist");if(!el)return;
+  if(!HIST||(!HIST.acc.length&&!HIST.off.length)){el.innerHTML=HIST&&D.targa&&D.targa.length>=5?'<div class="mu sm" style="margin-top:8px">Targa nuova: mai vista prima.</div>':"";return}
+  var a=HIST.acc[0],lk=lastKm(),html='<div class="hist"><b>Auto già vista</b> · '+HIST.acc.length+' accettazioni, '+HIST.off.length+' lavorazioni in officina'+(lk?' · ultimi km <b>'+lk.toLocaleString("it-IT")+'</b>':'');
+  if(a)html+='<div style="margin-top:6px">Ultima accettazione: '+dt(a.data,false)+(a.cliente_nome?' · '+h(a.cliente_nome):'')+(a.ndanni?' · '+a.ndanni+' danni segnati <button class="btn" data-old="'+a.id+'" style="padding:4px 10px;margin-left:4px">Vedi</button>':'')+'</div>';
+  if(HIST.off.length)html+='<div class="mu sm" style="margin-top:6px">Officina: '+HIST.off.slice(0,3).map(function(o){return dt(o.data,false)+" "+h(o.type||"")+(o.descr?" ("+h(o.descr)+")":"")}).join(" · ")+'</div>';
+  if(a)html+='<div style="margin-top:10px"><button class="btn" id="usa">Compila con i dati precedenti</button></div>';
+  el.innerHTML=html+'</div>';
+  if($("usa"))$("usa").onclick=function(){
+    var f={marca:a.marca,modello:a.modello,telaio:a.telaio,cliente_nome:a.cliente_nome,cliente_tel:a.cliente_tel,cliente_email:a.cliente_email};
+    if(!a.modello&&HIST.off[0])f.modello=HIST.off[0].modello;
+    for(var k in f)if(f[k]&&!D[k])D[k]=f[k];
+    saveSoon();stepVeicolo($("body"));toast("Dati copiati");
+  };
+  el.querySelectorAll("[data-old]").forEach(function(b){b.onclick=function(){if(confirm("Aprire l'accettazione precedente? Questa resta salvata."))flush().then(function(){openScheda(b.dataset.old,2)})}});
+}
+
+/* --- 2 foto --- */
+function stepFoto(b){
+  var bySlot={};D.foto.forEach(function(f){(bySlot[f.slot]=bySlot[f.slot]||[]).push(f)});
+  var done=SLOTS.filter(function(s){return bySlot[s[0]]}).length;
+  var tile=function(slot,label,list){
+    var f=list&&list[list.length-1],u=f&&URLS[f.path];
+    return'<button class="ft'+(f?" has":"")+'" data-slot="'+slot+'" data-label="'+h(label)+'"'+(u?' style="background-image:url(\''+h(u)+'\')"':'')+'>'+
+      (f?(list.length>1?'<span class="cnt">'+list.length+'</span>':'')+'<span class="lb">'+h(label)+' ✓</span>':'<span class="ic">📷</span>'+h(label))+'</button>'};
+  var extra=D.foto.filter(function(f){return!SLOTS.some(function(s){return s[0]===f.slot})});
+  b.innerHTML='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Giro dell\'auto: '+done+' / '+SLOTS.length+'</b><span class="mu sm">Tocca un riquadro per scattare</span></div></div>'+
+    '<div class="fg">'+SLOTS.map(function(s){return tile(s[0],s[1],bySlot[s[0]])}).join("")+
+    (UPS?'<div class="ft up"><div class="spin"></div>Invio '+UPS+'…</div>':'')+'</div>'+
+    '<h2>Altre foto ('+extra.length+')</h2><div class="fg">'+extra.map(function(f){var u=URLS[f.path];return'<button class="ft has" data-view="'+h(f.path)+'"'+(u?' style="background-image:url(\''+h(u)+'\')"':'')+'><span class="lb">'+h(f.label||"Extra")+'</span></button>'}).join("")+
+    '<button class="ft" data-slot="extra" data-label="Extra"><span class="ic">＋</span>Scatta altra foto</button><button class="ft" data-gal="1"><span class="ic">🖼</span>Dalla galleria</button></div>';
+  b.onclick=function(e){
+    var t=e.target.closest("[data-slot],[data-view],[data-gal]");if(!t)return;
+    if(t.dataset.view){viewFoto(t.dataset.view);return}
+    if(t.dataset.gal){SLOT_PICK={slot:"extra",label:"Extra"};$("gal").click();return}
+    var has=D.foto.filter(function(f){return f.slot===t.dataset.slot});
+    if(has.length&&t.dataset.slot!=="extra"){fotoMenu(t.dataset.slot,t.dataset.label,has);return}
+    shoot(t.dataset.slot,t.dataset.label);
+  };
+}
+function shoot(slot,label,cb,start){SLOT_PICK={slot:slot,label:label,cb:cb,start:start};var c=$("cam");c.value="";c.click()}
+function fotoMenu(slot,label,list){
+  var ov=overlay('<h2 style="margin-top:0">'+h(label)+'</h2><div class="fg">'+list.map(function(f){var u=URLS[f.path];return'<button class="ft has" data-view="'+h(f.path)+'"'+(u?' style="background-image:url(\''+h(u)+'\')"':'')+'></button>'}).join("")+'</div>'+
+    '<div style="display:grid;gap:10px;margin-top:14px"><button class="b ac" id="ag">📷 Scatta un\'altra</button><button class="b gh" id="cl">Chiudi</button></div>');
+  ov.querySelector("#ag").onclick=function(){ov.remove();shoot(slot,label)};
+  ov.querySelector("#cl").onclick=function(){ov.remove()};
+  ov.querySelector(".fg").onclick=function(e){var t=e.target.closest("[data-view]");if(t){ov.remove();viewFoto(t.dataset.view)}};
+}
+function onPick(files){
+  var p=SLOT_PICK;SLOT_PICK=null;if(!p||!files||!files.length||!D)return;
+  if(p.start)p.start();
+  Array.prototype.forEach.call(files,function(file){upload(file,p.slot,p.label).then(function(f){if(p.cb)p.cb(f)},function(){if(p.cb)p.cb(null)})});
+}
+$("cam").onchange=function(){onPick(this.files)};
+$("gal").onchange=function(){onPick(this.files)};
+
+function shrink(file){
+  var MAX=1600;
+  var draw=function(src,w,hh){var r=Math.min(1,MAX/Math.max(w,hh)),c=document.createElement("canvas");c.width=Math.round(w*r);c.height=Math.round(hh*r);
+    c.getContext("2d").drawImage(src,0,0,c.width,c.height);return new Promise(function(res){c.toBlob(function(bl){res(bl||file)},"image/jpeg",.82)})};
+  if(window.createImageBitmap)return createImageBitmap(file,{imageOrientation:"from-image"}).then(function(bm){return draw(bm,bm.width,bm.height)}).catch(function(){return viaImg()});
+  return viaImg();
+  function viaImg(){return new Promise(function(res){var u=URL.createObjectURL(file),i=new Image();i.onload=function(){draw(i,i.naturalWidth,i.naturalHeight).then(res);URL.revokeObjectURL(u)};i.onerror=function(){res(file)};i.src=u})}
+}
+function upload(file,slot,label){
+  var id=D.id;UPS++;setSv();if(STEP===1)renderStep();
+  return shrink(file).then(function(bl){
+    var fd=new FormData();fd.append("u",S.u);fd.append("p",S.p);fd.append("id",id);fd.append("slot",slot);fd.append("label",label||"");fd.append("file",bl,"foto.jpg");
+    return fx(fd,true);
+  }).then(function(f){
+    URLS[f.path]=f.url;if(D&&D.id===id){D.foto.push({path:f.path,slot:f.slot,label:f.label,ts:f.ts})}
+    return f;
+  }).catch(function(e){toast("Foto non inviata: "+e.message,true);throw e})
+  .finally(function(){UPS--;if(D&&D.id===id){setSv();if(STEP===1||STEP===2)renderStep()}});
+}
+function viewFoto(path){
+  var f=D.foto.filter(function(x){return x.path===path})[0]||{};
+  var ov=document.createElement("div");ov.className="ov full";
+  ov.innerHTML='<img src="'+h(URLS[path]||"")+'" alt=""><div><b>'+h(f.label||f.slot||"")+'</b> <span class="mu sm">'+dt(f.ts)+'</span></div>'+
+    '<div style="display:flex;gap:10px;width:100%;max-width:500px"><button class="b ko" id="fd" style="flex:1">Elimina foto</button><button class="b gh" id="fc" style="flex:1">Chiudi</button></div>';
+  document.body.appendChild(ov);
+  ov.querySelector("#fc").onclick=function(){ov.remove()};
+  ov.querySelector("#fd").onclick=function(){
+    if(!confirm("Eliminare questa foto?"))return;
+    fx({a:"del",u:S.u,p:S.p,id:D.id,path:path}).then(function(){
+      D.foto=D.foto.filter(function(x){return x.path!==path});
+      D.danni.forEach(function(d){if(d.foto===path){d.foto=null;saveSoon()}});
+      ov.remove();renderStep();
+    }).catch(function(e){toast(e.message,true)});
+  };
+}
+function overlay(html){var ov=document.createElement("div");ov.className="ov";ov.innerHTML='<div class="sheet">'+html+'</div>';
+  ov.addEventListener("click",function(e){if(e.target===ov)ov.remove()});document.body.appendChild(ov);return ov}
+
+/* --- 3 danni --- */
+function carSvg(danni,big){
+  var m=(danni||[]).map(function(d,i){var t=tipo(d.tipo),x=d.x*200,y=d.y*400;
+    return'<g data-d="'+i+'"><circle cx="'+x+'" cy="'+y+'" r="'+(big?13:11)+'" fill="'+t[2]+'" stroke="#000" stroke-width="2"/><text x="'+x+'" y="'+(y+5)+'" text-anchor="middle" font-size="'+(big?15:13)+'" font-weight="800" fill="#111" style="pointer-events:none">'+(i+1)+'</text></g>'}).join("");
+  var c="#8a96a8";
+  return'<svg id="'+(big?"car":"carp")+'" viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg" font-family="system-ui,sans-serif">'+
+    '<text x="100" y="13" text-anchor="middle" font-size="11" font-weight="700" fill="'+c+'">FRONTE</text>'+
+    '<text x="100" y="396" text-anchor="middle" font-size="11" font-weight="700" fill="'+c+'">RETRO</text>'+
+    '<text x="9" y="204" text-anchor="middle" font-size="11" font-weight="700" fill="'+c+'">SX</text>'+
+    '<text x="191" y="204" text-anchor="middle" font-size="11" font-weight="700" fill="'+c+'">DX</text>'+
+    '<g fill="none" stroke="'+c+'" stroke-width="2.5" stroke-linejoin="round">'+
+    '<rect x="26" y="62" width="14" height="50" rx="5" fill="'+c+'"/><rect x="160" y="62" width="14" height="50" rx="5" fill="'+c+'"/>'+
+    '<rect x="26" y="282" width="14" height="50" rx="5" fill="'+c+'"/><rect x="160" y="282" width="14" height="50" rx="5" fill="'+c+'"/>'+
+    '<path d="M70 24 Q100 16 130 24 Q160 30 162 70 L164 330 Q162 372 130 378 Q100 384 70 378 Q38 372 36 330 L38 70 Q40 30 70 24 Z"/>'+
+    '<path d="M50 128 Q100 112 150 128 L142 162 Q100 152 58 162 Z"/>'+
+    '<path d="M58 162 Q100 152 142 162 L142 268 Q100 276 58 268 Z" stroke-dasharray="4 4"/>'+
+    '<path d="M58 268 Q100 276 142 268 L150 302 Q100 316 50 302 Z"/>'+
+    '<path d="M58 165 L46 170 L46 262 L58 266"/><path d="M142 165 L154 170 L154 262 L142 266"/>'+
+    '<path d="M38 140 L24 134 L22 150 L38 152"/><path d="M162 140 L176 134 L178 150 L162 152"/>'+
+    '<path d="M48 34 Q56 28 68 28"/><path d="M152 34 Q144 28 132 28"/>'+
+    '<path d="M50 372 L66 374"/><path d="M150 372 L134 374"/>'+
+    '<line x1="38" y1="215" x2="46" y2="215"/><line x1="154" y1="215" x2="162" y2="215"/>'+
+    '</g>'+m+'</svg>';
+}
+function zona(x,y){var v=y<.3?"anteriore":y>.7?"posteriore":"centrale",o=x<.38?"sx":x>.62?"dx":"";return(v==="centrale"&&o?"fianco "+o:v+(o?" "+o:""))}
+function stepDanni(b){
+  var nd=D.checklist.nessun_danno;
+  b.innerHTML='<div class="card"><div class="mu" style="margin-bottom:10px">Tocca il disegno dove c\'è il danno: graffi, ammaccature, viti rotte, specchietti…</div><div class="carw">'+carSvg(D.danni,true)+
+    '<div class="dl" id="dl">'+(D.danni.length?D.danni.map(function(d,i){var t=tipo(d.tipo);
+      return'<button class="dn" data-d="'+i+'"><span class="dot" style="background:'+t[2]+'">'+(i+1)+'</span><div style="flex:1;min-width:0"><b>'+h(t[1])+'</b> <span class="mu sm">'+h(zona(d.x,d.y))+'</span>'+
+      (d.nota?'<div>'+h(d.nota)+'</div>':'')+(d.foto?'<div class="ok-t sm">📷 foto allegata</div>':'')+'</div></button>'}).join(""):
+      '<div class="mu">Nessun danno segnato.</div>')+
+    '<label style="display:flex;align-items:center;gap:12px;margin-top:14px"><input type="checkbox" id="nd" '+(nd?"checked":"")+' '+(D.danni.length?"disabled":"")+' style="width:28px;height:28px;accent-color:#22c55e"> Nessun danno visibile</label></div></div></div>';
+  var svg=$("car");
+  svg.addEventListener("click",function(e){
+    var g=e.target.closest("[data-d]");if(g){editDanno(+g.dataset.d);return}
+    var r=svg.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    if(x<0||x>1||y<0||y>1)return;
+    editDanno(-1,{x:Math.round(x*1000)/1000,y:Math.round(y*1000)/1000,tipo:"graffio",nota:"",foto:null});
+  });
+  $("dl").onclick=function(e){var t=e.target.closest("[data-d]");if(t)editDanno(+t.dataset.d)};
+  $("nd").onchange=function(){D.checklist.nessun_danno=this.checked;saveSoon()};
+}
+function editDanno(i,nw){
+  var d=i>=0?JSON.parse(JSON.stringify(D.danni[i])):nw,num=i>=0?i+1:D.danni.length+1;
+  var ov=overlay('<h2 style="margin-top:0">Danno '+num+' <span class="mu sm">'+h(zona(d.x,d.y))+'</span></h2>'+
+    '<label>Tipo</label><div class="chips" id="tp">'+TIPI.map(function(t){return'<button class="chip'+(d.tipo===t[0]?" sel":"")+'" data-t="'+t[0]+'"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:'+t[2]+';margin-right:6px"></span>'+t[1]+'</button>'}).join("")+'</div>'+
+    '<label>Descrizione</label><input class="f" id="dnota" value="'+h(d.nota)+'" placeholder="Es. graffio 10 cm sulla portiera, vite carter mancante">'+
+    '<div id="dfoto" style="margin-top:14px"></div>'+
+    '<div style="display:grid;gap:10px;margin-top:16px"><button class="b" id="dok">Salva danno</button>'+(i>=0?'<button class="b ko" id="ddel">Elimina danno</button>':'')+'<button class="b gh" id="dcl">Annulla</button></div>');
+  var drawFoto=function(){var u=d.foto&&URLS[d.foto];
+    ov.querySelector("#dfoto").innerHTML=d.foto?'<div style="display:flex;gap:12px;align-items:center">'+(u?'<img src="'+h(u)+'" style="width:110px;height:82px;object-fit:cover;border-radius:10px">':'')+'<button class="btn" id="dfs">📷 Rifai foto</button></div>':
+      '<button class="b ac" id="dfs">📷 Foto del danno</button>';
+    ov.querySelector("#dfs").onclick=function(){
+      var t=tipo(d.tipo);
+      shoot("danno","Danno "+num+" – "+t[1],function(f){
+        if(f){d.foto=f.path;if(!document.body.contains(ov)&&i>=0&&D.danni[i]){D.danni[i].foto=f.path;saveSoon()}}
+        if(document.body.contains(ov))drawFoto();
+      },function(){ov.querySelector("#dfoto").innerHTML='<div style="display:flex;gap:10px;align-items:center"><div class="spin"></div> Invio foto…</div>'});
+    };
+  };
+  drawFoto();
+  ov.querySelector("#tp").onclick=function(e){var t=e.target.closest("[data-t]");if(!t)return;d.tipo=t.dataset.t;this.querySelectorAll(".chip").forEach(function(c){c.classList.toggle("sel",c===t)})};
+  ov.querySelector("#dok").onclick=function(){d.nota=ov.querySelector("#dnota").value.trim();if(i>=0)D.danni[i]=d;else D.danni.push(d);D.checklist.nessun_danno=false;saveSoon();ov.remove();renderStep()};
+  if(i>=0)ov.querySelector("#ddel").onclick=function(){if(!confirm("Eliminare il danno "+num+"?"))return;D.danni.splice(i,1);saveSoon();ov.remove();renderStep()};
+  ov.querySelector("#dcl").onclick=function(){ov.remove()};
+}
+
+/* --- 4 controlli --- */
+function stepControlli(b){
+  b.innerHTML='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Controllo rapido</b><button class="btn" id="allok">Tutto OK</button></div>'+
+    CK.map(function(c){var v=D.checklist[c[0]]||{};
+      return'<div class="ck" data-k="'+c[0]+'"><div class="nm">'+h(c[1])+'</div><div class="seg">'+
+      [["ok","OK"],["ko","Problema"],["nc","N/C"]].map(function(s){return'<button class="s-'+s[0]+(v.s===s[0]?" sel":"")+'" data-s="'+s[0]+'">'+s[1]+'</button>'}).join("")+'</div>'+
+      (v.s==="ko"?'<input class="f" data-n="'+c[0]+'" value="'+h(v.n)+'" placeholder="Cosa c\'è che non va?">':'')+'</div>'}).join("")+'</div>';
+  b.onclick=function(e){
+    if(e.target.id==="allok"){CK.forEach(function(c){if(!D.checklist[c[0]]||!D.checklist[c[0]].s)D.checklist[c[0]]={s:"ok"}});saveSoon();stepControlli(b);return}
+    var t=e.target.closest("[data-s]");if(!t)return;var k=t.closest("[data-k]").dataset.k,cur=D.checklist[k]||{};
+    D.checklist[k]={s:t.dataset.s,n:cur.n||""};saveSoon();stepControlli(b);
+    if(t.dataset.s==="ko"){var inp=b.querySelector('[data-n="'+k+'"]');if(inp)inp.focus()}
+  };
+  b.oninput=function(e){var k=e.target.dataset.n;if(!k)return;D.checklist[k].n=e.target.value;saveSoon()};
+}
+
+/* --- 5 firma e chiusura --- */
+function problemi(){return CK.filter(function(c){return D.checklist[c[0]]&&D.checklist[c[0]].s==="ko"}).map(function(c){return c[1]+(D.checklist[c[0]].n?" ("+D.checklist[c[0]].n+")":"")})}
+function stepFirma(b){
+  var pr=problemi(),miss=[];
+  if(!D.targa)miss.push("targa");if(!D.km)miss.push("km");if(!D.cliente_nome)miss.push("nome cliente");
+  if(D.foto.length<4)miss.push("almeno 4 foto");
+  if(!D.danni.length&&!D.checklist.nessun_danno)miss.push("danni (oppure «nessun danno visibile»)");
+  b.innerHTML='<div class="card"><dl class="sum">'+
+    '<dt>Veicolo</dt><dd>'+h(D.targa||"—")+' '+h([D.marca,D.modello].filter(Boolean).join(" "))+'</dd>'+
+    '<dt>Km</dt><dd>'+h(D.km?(+D.km).toLocaleString("it-IT"):"—")+'</dd>'+
+    '<dt>Carburante</dt><dd>'+(D.carburante!=null?CARB[D.carburante]:"—")+'</dd>'+
+    '<dt>Cliente</dt><dd>'+h(D.cliente_nome||"—")+(D.cliente_tel?' · '+h(D.cliente_tel):'')+'</dd>'+
+    '<dt>Richiesta</dt><dd>'+h(D.richiesta||"—")+(D.lavaggio?' · <span class="ok-t">lavaggio</span>':'')+'</dd>'+
+    '<dt>Foto</dt><dd>'+D.foto.length+'</dd>'+
+    '<dt>Danni</dt><dd>'+(D.danni.length?D.danni.map(function(d,i){return(i+1)+". "+h(tipo(d.tipo)[1])+" "+h(zona(d.x,d.y))}).join(", "):(D.checklist.nessun_danno?"nessun danno visibile":"—"))+'</dd>'+
+    (pr.length?'<dt>Problemi</dt><dd style="color:#fca5a5">'+h(pr.join(", "))+'</dd>':'')+
+    '</dl>'+(miss.length?'<div class="hist warn" style="margin-top:12px">Manca: '+h(miss.join(", "))+'</div>':'')+'</div>'+
+    '<div class="card"><label>Firma del cliente</label><p class="mu sm" style="margin:0 0 8px">Il cliente conferma lo stato del veicolo al momento della consegna, come descritto e fotografato in questa scheda.</p>'+
+    (D.firma?'<img src="'+h(D.firma)+'" style="width:100%;background:#fff;border-radius:12px"><div class="mu sm">Firmata il '+dt(D.firmata_at)+'</div><div style="margin-top:10px"><button class="btn" id="rf">Rifai firma</button></div>':
+      '<canvas id="sig"></canvas><div style="display:flex;gap:10px;margin-top:10px"><button class="btn" id="sc">Cancella</button><button class="b" id="ss" style="flex:1;min-height:48px">Conferma firma</button></div>')+'</div>'+
+    '<div style="display:grid;gap:10px">'+
+    (D.stato==="chiusa"?'<div class="card ok-t" style="font-weight:800;text-align:center">✓ Accettazione completata</div><button class="b gh" id="ro">Riapri per modificare</button>':
+      '<button class="b" id="cz">✓ Chiudi accettazione</button>')+
+    '<button class="b gh" id="pr">🖨 Stampa / salva PDF</button>'+
+    (D.cliente_tel?'<a class="b gh" style="text-align:center;text-decoration:none" href="https://wa.me/'+h(waNum(D.cliente_tel))+'?text='+encodeURIComponent(waText())+'" target="_blank" rel="noopener">💬 Avvisa il cliente su WhatsApp</a>':'')+
+    '</div>';
+  if($("sig"))initSig();
+  if($("rf"))$("rf").onclick=function(){rpc("acc_firma",A({p_id:D.id,p_firma:""})).then(function(){D.firma=null;D.firmata_at=null;stepFirma(b)}).catch(function(e){toast(e.message,true)})};
+  if($("cz"))$("cz").onclick=function(){
+    if(miss.length&&!confirm("Manca: "+miss.join(", ")+".\nChiudere comunque?"))return;
+    flush().then(function(){return rpc("acc_stato",A({p_id:D.id,p_s:"chiusa"}))}).then(function(){D.stato="chiusa";toast("Accettazione completata");stepFirma(b);head()}).catch(function(e){toast(e.message,true)})};
+  if($("ro"))$("ro").onclick=function(){rpc("acc_stato",A({p_id:D.id,p_s:"bozza"})).then(function(){D.stato="bozza";stepFirma(b);head()}).catch(function(e){toast(e.message,true)})};
+  $("pr").onclick=stampa;
+}
+function waNum(t){var n=String(t).replace(/\D/g,"");if(n.indexOf("00")===0)n=n.slice(2);else if(n.length<=10)n="39"+n;return n}
+function waText(){return"Buongiorno"+(D.cliente_nome?" "+D.cliente_nome.split(" ")[0]:"")+", abbiamo preso in carico la sua "+[D.marca,D.modello].filter(Boolean).join(" ")+" targata "+(D.targa||"")+" (accettazione n° "+D.num+")."+(D.riconsegna?" Riconsegna prevista: "+dt(D.riconsegna,false)+".":"")+" S.D.Garage"}
+function initSig(){
+  var c=$("sig"),r=c.getBoundingClientRect(),dpr=window.devicePixelRatio||1;c.width=r.width*dpr;c.height=r.height*dpr;
+  var x=c.getContext("2d");x.scale(dpr,dpr);x.lineWidth=2.6;x.lineCap="round";x.lineJoin="round";x.strokeStyle="#111";
+  var dn=false,used=false,last=null;
+  var pt=function(e){var b=c.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top]};
+  c.onpointerdown=function(e){dn=true;used=true;last=pt(e);c.setPointerCapture(e.pointerId);x.beginPath();x.arc(last[0],last[1],1.2,0,7);x.fill()};
+  c.onpointermove=function(e){if(!dn)return;var p=pt(e);x.beginPath();x.moveTo(last[0],last[1]);x.lineTo(p[0],p[1]);x.stroke();last=p};
+  c.onpointerup=c.onpointercancel=function(){dn=false};
+  $("sc").onclick=function(){x.clearRect(0,0,c.width,c.height);used=false};
+  $("ss").onclick=function(){
+    if(!used){toast("Fai firmare il cliente nel riquadro bianco",true);return}
+    var o=document.createElement("canvas"),s=Math.min(1,700/c.width);o.width=c.width*s;o.height=c.height*s;
+    var ox=o.getContext("2d");ox.fillStyle="#fff";ox.fillRect(0,0,o.width,o.height);ox.drawImage(c,0,0,o.width,o.height);
+    var data=o.toDataURL("image/png");
+    rpc("acc_firma",A({p_id:D.id,p_firma:data})).then(function(){D.firma=data;D.firmata_at=new Date().toISOString();stepFirma($("body"))}).catch(function(e){toast(e.message,true)});
+  };
+}
+
+/* --- stampa --- */
+function stampa(){
+  flush();
+  sign(D.foto.map(function(f){return f.path})).then(function(){
+    var pr=problemi(),row=function(k,v){return v?'<tr><td style="width:30%"><b>'+k+'</b></td><td>'+v+'</td></tr>':""};
+    $("print").innerHTML='<div style="display:flex;justify-content:space-between;align-items:flex-end"><div><h1>S.D.Garage — Scheda di accettazione</h1><div>N° '+D.num+' · '+dt(D.created_at)+' · operatore '+h(D.operatore||"")+'</div></div><div style="font-size:16pt;font-weight:800;font-family:monospace">'+h(D.targa||"")+'</div></div>'+
+      '<h3>Veicolo e cliente</h3><table>'+row("Veicolo",h([D.marca,D.modello].filter(Boolean).join(" ")))+row("Telaio",h(D.telaio))+row("Km",D.km?(+D.km).toLocaleString("it-IT"):"")+
+      row("Carburante",D.carburante!=null?CARB[D.carburante]:"")+row("Chiavi",D.chiavi?String(D.chiavi):"")+row("Cliente",h(D.cliente_nome))+row("Telefono",h(D.cliente_tel))+row("Email",h(D.cliente_email))+
+      row("Richiesta",h(D.richiesta))+row("Lavaggio",D.lavaggio?"Sì":"")+row("Oggetti in auto",h(D.oggetti))+row("Riconsegna prevista",D.riconsegna?dt(D.riconsegna,false):"")+'</table>'+
+      '<h3>Stato del veicolo</h3><div style="display:flex;gap:16px;align-items:flex-start"><div>'+carSvg(D.danni,false).replace(/#8a96a8/g,"#555")+'</div><div style="flex:1">'+
+      (D.danni.length?'<ol style="margin:0;padding-left:18px">'+D.danni.map(function(d){return'<li><b>'+h(tipo(d.tipo)[1])+'</b> – '+h(zona(d.x,d.y))+(d.nota?': '+h(d.nota):'')+'</li>'}).join("")+'</ol>':(D.checklist.nessun_danno?"Nessun danno visibile.":"Nessun danno segnato."))+
+      '<p><b>Controlli:</b> '+(CK.filter(function(c){return D.checklist[c[0]]&&D.checklist[c[0]].s}).map(function(c){var v=D.checklist[c[0]];return h(c[1])+": "+(v.s==="ok"?"OK":v.s==="ko"?"<b>PROBLEMA</b>"+(v.n?" ("+h(v.n)+")":""):"n/c")}).join(" · ")||"—")+'</p></div></div>'+
+      '<h3>Fotografie ('+D.foto.length+')</h3><div class="pg">'+D.foto.map(function(f){return'<div><img src="'+h(URLS[f.path]||"")+'"><br>'+h(f.label||f.slot)+' · '+dt(f.ts)+'</div>'}).join("")+'</div>'+
+      (D.note?'<h3>Note</h3><p>'+h(D.note)+'</p>':'')+
+      '<h3>Firma del cliente</h3><p style="font-size:9pt">Il cliente conferma lo stato del veicolo al momento della consegna, come descritto e fotografato in questa scheda.</p>'+
+      (D.firma?'<img src="'+h(D.firma)+'" style="height:90px"><div style="font-size:9pt">'+dt(D.firmata_at)+'</div>':'<div style="height:80px;border-bottom:1px solid #000;width:60%"></div>');
+    var imgs=$("print").querySelectorAll("img"),n=imgs.length,done=0,fire=function(){window.print()};
+    if(!n)return fire();
+    var t=setTimeout(fire,6000);
+    imgs.forEach(function(i){var f=function(){if(++done===n){clearTimeout(t);fire()}};if(i.complete)f();else{i.onload=f;i.onerror=f}});
+  }).catch(function(e){toast(e.message,true)});
+}
+
+/* avvio */
+(function(){var s=load("acc_s");if(s&&s.u!=null&&s.p){S=s;rpc("acc_login",{p_u:s.u,p_p:s.p}).then(function(n){S.nome=n;viewList()}).catch(function(e){if(/PIN/.test(e.message))logout();else viewList()})}else viewLogin()})();
+</script>
+</body>
+</html>
