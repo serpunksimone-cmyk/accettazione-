@@ -150,13 +150,16 @@ function lfPut(rec){return idb().then(function(d){return new Promise(function(ok
 function lfOf(sid){return idb().then(function(d){return new Promise(function(ok,ko){var q=d.transaction("foto").objectStore("foto").index("sid").getAll(sid);q.onsuccess=function(){ok(q.result||[])};q.onerror=function(){ko(q.error)}})}).catch(function(){return[]})}
 function lfDel(path){return idb().then(function(d){return new Promise(function(ok){var t=d.transaction("foto","readwrite");t.objectStore("foto")["delete"](path);t.oncomplete=ok;t.onerror=ok})}).catch(function(){})}
 function lfDelAll(sid){return lfOf(sid).then(function(l){return Promise.all(l.map(function(x){return lfDel(x.path)}))})}
+function toBuf(bl){return bl.arrayBuffer?bl.arrayBuffer():new Promise(function(ok,ko){var fr=new FileReader();fr.onload=function(){ok(fr.result)};fr.onerror=function(){ko(fr.error)};fr.readAsArrayBuffer(bl)})}
+function recBlob(x){return x.buf?new Blob([x.buf],{type:x.type||"image/jpeg"}):x.blob||null}
+var MEM={};
 function isLoc(p){return typeof p==="string"&&p.indexOf("loc:")===0}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 function sign(paths){
   paths=paths.filter(function(p){return p&&!URLS[p]});
   if(!paths.length)return Promise.resolve();
   var loc=paths.filter(isLoc),rem=paths.filter(function(p){return!isLoc(p)});
-  var pl=Promise.all(loc.map(function(p){return idb().then(function(d){return new Promise(function(ok){var q=d.transaction("foto").objectStore("foto").get(p);q.onsuccess=function(){if(q.result&&q.result.blob)URLS[p]=URL.createObjectURL(q.result.blob);ok()};q.onerror=ok})}).catch(function(){})}));
+  var pl=Promise.all(loc.map(function(p){return idb().then(function(d){return new Promise(function(ok){var q=d.transaction("foto").objectStore("foto").get(p);q.onsuccess=function(){var bb=q.result&&recBlob(q.result);if(bb)URLS[p]=URL.createObjectURL(bb);else if(MEM[p])URLS[p]=URL.createObjectURL(MEM[p]);ok()};q.onerror=ok})}).catch(function(){})}));
   var pr=rem.length?fx({a:"urls",u:S.u,p:S.p,paths:rem}).then(function(r){for(var k in r.urls)URLS[k]=r.urls[k]}):Promise.resolve();
   return Promise.all([pl,pr]).then(function(){});
 }
@@ -438,10 +441,12 @@ function upload(file,slot,label){
   var id=D.id;UPS++;setSv();if(STEP===1)renderStep();
   return shrink(file).then(function(bl){
     var f={path:"loc:"+id+":"+Date.now()+"_"+Math.random().toString(36).slice(2,7),slot:slot,label:label||"",ts:new Date().toISOString()};
-    return lfPut({path:f.path,sid:id,slot:f.slot,label:f.label,ts:f.ts,blob:bl}).then(function(){
+    return toBuf(bl).then(function(buf){return lfPut({path:f.path,sid:id,slot:f.slot,label:f.label,ts:f.ts,buf:buf,type:bl.type||"image/jpeg"})}).catch(function(e){
+      MEM[f.path]=bl;toast("Attenzione: il tablet non ha salvato la foto in modo permanente ("+((e&&(e.name||e.message))||"errore")+"). Resta solo finché la pagina è aperta.",true)
+    }).then(function(){
       URLS[f.path]=URL.createObjectURL(bl);if(D&&D.id===id){D.foto.push({path:f.path,slot:f.slot,label:f.label,ts:f.ts})}
       return f});
-  }).catch(function(e){toast("Foto non salvata sul tablet: "+(e&&e.message||e),true);throw e})
+  }).catch(function(e){toast("Foto non salvata: "+((e&&(e.name||e.message))||e),true);throw e})
   .finally(function(){UPS--;if(D&&D.id===id){setSv();if(STEP===1||STEP===2)renderStep()}});
 }
 function viewFoto(path){
