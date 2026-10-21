@@ -306,7 +306,7 @@ function bindFields(root){
 /* --- 1 veicolo e cliente --- */
 function stepVeicolo(b){
   b.innerHTML='<div class="card"><label>Targa</label><input class="f targa" data-f="targa" value="'+h(D.targa)+'" placeholder="AB123CD" autocomplete="off" autocapitalize="characters">'+
-    '<div id="hist"></div>'+
+    '<div id="hist"></div><div id="ore"></div>'+
     '<div class="row"><div><label>Marca</label><input class="f" data-f="marca" value="'+h(D.marca)+'" placeholder="Fiat"></div><div><label>Modello</label><input class="f" data-f="modello" value="'+h(D.modello)+'" placeholder="Panda"></div></div>'+
     '<div class="row"><div><label>Km</label><input class="f" data-f="km" inputmode="numeric" value="'+h(D.km)+'" placeholder="123456"></div><div><label>Chiavi consegnate</label><div class="seg" id="chiavi">'+[1,2,3].map(function(n){return'<button data-v="'+n+'" class="'+(+D.chiavi===n?"sel":"")+'">'+n+'</button>'}).join("")+'</div></div></div>'+
     '<div id="kmw"></div>'+
@@ -322,12 +322,28 @@ function stepVeicolo(b){
   bindFields(b);
   $("carb").onclick=function(e){var t=e.target.closest("[data-v]");if(!t)return;D.carburante=+t.dataset.v;this.querySelectorAll("button").forEach(function(x){x.classList.toggle("sel",x===t)});saveSoon()};
   $("chiavi").onclick=function(e){var t=e.target.closest("[data-v]");if(!t)return;D.chiavi=+t.dataset.v;this.querySelectorAll("button").forEach(function(x){x.classList.toggle("sel",x===t)});saveSoon()};
-  drawHist();kmWarn();
+  drawHist();kmWarn();loadOre();
+}
+var TARGETS={"Tagliando":120};
+function oreMin(e){var end=e.t_out||Date.now();return Math.max(0,(end-e.t_in-(e.paused_ms||0)-((e.paused&&!e.t_out)?Date.now()-e.paused:0))/60000)}
+function oreFmt(m){m=Math.round(m);return Math.floor(m/60)+"h "+("0"+(m%60)).slice(-2)+"m"}
+function loadOre(){
+  var el=$("ore");if(!el||S.u!==0)return;
+  var t=(D.targa||"").trim();if(t.length<4){el.innerHTML="";return}
+  rpc("acc_ore",A({p_targa:t,p_dal:D.created_at?new Date(D.created_at).getTime()-12*3600000:0})).then(function(o){
+    var e2=$("ore");if(!e2||!D||D.targa!==t)return;
+    if(!o.length){e2.innerHTML='<div class="hist" style="background:#f6f7f9;border-color:var(--bd)"><b style="color:var(--tx)">Tempi di lavoro</b><div class="mu sm" style="margin-top:4px">Nessuna timbratura in officina per questa targa dopo l\'accettazione.</div></div>';return}
+    var tot=0,per={};o.forEach(function(x){var m=oreMin(x);tot+=m;var k=x.name;per[k]=(per[k]||0)+m});
+    e2.innerHTML='<div class="hist" style="background:#f6f7f9;border-color:var(--bd)"><b style="color:var(--tx)">Tempi di lavoro</b> · totale <b style="color:var(--tx)">'+oreFmt(tot)+'</b>'+
+      '<div class="mu sm" style="margin-top:4px">'+Object.keys(per).map(function(k){return h(k)+' '+oreFmt(per[k])}).join(' · ')+'</div>'+
+      '<div style="margin-top:8px">'+o.map(function(x){var m=oreMin(x),lim=TARGETS[x.type],red=lim&&m>lim;
+        return'<div class="ck" style="padding:6px 0"><div class="nm" style="min-width:0">'+dt(x.t_in,false)+' · '+h(x.name)+(x.da?' <span class="mu sm">(da '+h(x.da)+')</span>':'')+'<div class="mu sm">'+h(x.type||"")+(x.descr?' · '+h(x.descr):'')+(x.t_out?'':' · in corso')+'</div></div><b style="'+(red?'color:#dc2626':'')+'">'+oreFmt(m)+(red?' ⏱':'')+'</b></div>'}).join('')+'</div></div>';
+  }).catch(function(){})
 }
 function loadHist(){
   var t=(D.targa||"").trim();
   if(t.length<4){HIST=null;drawHist();return}
-  rpc("acc_storico",A({p_targa:t,p_esclude:D.id})).then(function(r){if(D&&D.targa===t){HIST=r;drawHist();kmWarn()}}).catch(function(){});
+  rpc("acc_storico",A({p_targa:t,p_esclude:D.id})).then(function(r){if(D&&D.targa===t){HIST=r;drawHist();kmWarn();loadOre()}}).catch(function(){});
 }
 function lastKm(){
   if(!HIST)return null;var m=null;
