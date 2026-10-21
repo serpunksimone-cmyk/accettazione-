@@ -143,10 +143,22 @@ function fx(body,isForm){
   var hd={apikey:KEY,Authorization:"Bearer "+KEY};if(!isForm)hd["Content-Type"]="application/json";
   return fetch(FN,{method:"POST",headers:hd,body:isForm?body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){if(!r.ok||j.error)throw new Error(j.error||("Errore "+r.status));return j})});
 }
+/* ---- foto: salvate solo sul tablet (IndexedDB), mai su Supabase ---- */
+var IDBP=null;
+function idb(){if(IDBP)return IDBP;IDBP=new Promise(function(ok,ko){try{var q=indexedDB.open("accettazione-foto",1);q.onupgradeneeded=function(){var st=q.result.createObjectStore("foto",{keyPath:"path"});st.createIndex("sid","sid")};q.onsuccess=function(){ok(q.result)};q.onerror=function(){ko(q.error)}}catch(e){ko(e)}});return IDBP}
+function lfPut(rec){return idb().then(function(d){return new Promise(function(ok,ko){var t=d.transaction("foto","readwrite");t.objectStore("foto").put(rec);t.oncomplete=ok;t.onerror=function(){ko(t.error)}})})}
+function lfOf(sid){return idb().then(function(d){return new Promise(function(ok,ko){var q=d.transaction("foto").objectStore("foto").index("sid").getAll(sid);q.onsuccess=function(){ok(q.result||[])};q.onerror=function(){ko(q.error)}})}).catch(function(){return[]})}
+function lfDel(path){return idb().then(function(d){return new Promise(function(ok){var t=d.transaction("foto","readwrite");t.objectStore("foto")["delete"](path);t.oncomplete=ok;t.onerror=ok})}).catch(function(){})}
+function lfDelAll(sid){return lfOf(sid).then(function(l){return Promise.all(l.map(function(x){return lfDel(x.path)}))})}
+function isLoc(p){return typeof p==="string"&&p.indexOf("loc:")===0}
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 function sign(paths){
   paths=paths.filter(function(p){return p&&!URLS[p]});
   if(!paths.length)return Promise.resolve();
-  return fx({a:"urls",u:S.u,p:S.p,paths:paths}).then(function(r){for(var k in r.urls)URLS[k]=r.urls[k]});
+  var loc=paths.filter(isLoc),rem=paths.filter(function(p){return!isLoc(p)});
+  var pl=Promise.all(loc.map(function(p){return idb().then(function(d){return new Promise(function(ok){var q=d.transaction("foto").objectStore("foto").get(p);q.onsuccess=function(){if(q.result&&q.result.blob)URLS[p]=URL.createObjectURL(q.result.blob);ok()};q.onerror=ok})}).catch(function(){})}));
+  var pr=rem.length?fx({a:"urls",u:S.u,p:S.p,paths:rem}).then(function(r){for(var k in r.urls)URLS[k]=r.urls[k]}):Promise.resolve();
+  return Promise.all([pl,pr]).then(function(){});
 }
 
 /* ---------- accesso ---------- */
@@ -241,7 +253,12 @@ function openScheda(id,step){
   rpc("acc_get",A({p_id:id})).then(function(r){
     D=r;D.checklist=D.checklist||{};D.danni=D.danni||[];D.foto=D.foto||[];STEP=step||0;HIST=null;
     viewScheda();
-    sign(D.foto.map(function(f){return f.path})).then(function(){if(STEP===1||STEP===2)renderStep()}).catch(function(){});
+    lfOf(r.id).then(function(loc){
+      if(!D||D.id!==r.id)return;
+      loc.sort(function(a,b){return a.ts<b.ts?-1:1});
+      loc.forEach(function(x){if(!D.foto.some(function(f){return f.path===x.path}))D.foto.push({path:x.path,slot:x.slot,label:x.label,ts:x.ts})});
+      if(STEP===1||STEP===2)renderStep();else head();
+    }).then(function(){return sign(D.foto.map(function(f){return f.path}))}).then(function(){if(STEP===1||STEP===2)renderStep()}).catch(function(){});
     if(D.targa)loadHist();
   }).catch(function(e){if(!authFail(e)){toast(e.message,true);viewList()}});
 }
@@ -253,7 +270,7 @@ function viewScheda(){
     '<div class="bar"><div class="in"><button class="b gh" id="pv" style="flex:1">‹ Indietro</button><button class="b ac" id="nx" style="flex:2">Avanti ›</button></div></div>';
   $("bk").onclick=function(){flush().then(viewList)};
   if($("dl"))$("dl").onclick=function(){if(!confirm("Eliminare definitivamente questa accettazione e tutte le sue foto?"))return;
-    fx({a:"purge",o:S.p,id:D.id}).then(function(){toast("Eliminata");viewList()}).catch(function(x){toast(x.message,true)})};
+    fx({a:"purge",o:S.p,id:D.id}).then(function(){return lfDelAll(D.id)}).then(function(){toast("Eliminata");viewList()}).catch(function(x){toast(x.message,true)})};
   $("st").onclick=function(e){var b=e.target.closest("[data-s]");if(b)go(+b.dataset.s)};
   $("pv").onclick=function(){if(STEP>0)go(STEP-1);else flush().then(viewList)};
   $("nx").onclick=function(){if(STEP<STEPS.length-1)go(STEP+1);else flush().then(viewList)};
@@ -268,7 +285,7 @@ function head(){
   $("nx").textContent=STEP===STEPS.length-1?"Fine ✓":"Avanti ›";
   setSv();
 }
-function setSv(){var e=$("sv");if(!e)return;e.textContent=UPS?"Invio foto… ("+UPS+")":SAVING||DIRTY?"Salvataggio…":D.stato==="chiusa"?"Completa ✓":"Salvato ✓"}
+function setSv(){var e=$("sv");if(!e)return;e.textContent=UPS?"Salvo foto… ("+UPS+")":SAVING||DIRTY?"Salvataggio…":D.stato==="chiusa"?"Completa ✓":"Salvato ✓"}
 function go(i){flush();STEP=i;window.scrollTo(0,0);renderStep()}
 function renderStep(){
   if(!D||!$("body"))return;head();
@@ -420,12 +437,11 @@ function shrink(file){
 function upload(file,slot,label){
   var id=D.id;UPS++;setSv();if(STEP===1)renderStep();
   return shrink(file).then(function(bl){
-    var fd=new FormData();fd.append("u",S.u);fd.append("p",S.p);fd.append("id",id);fd.append("slot",slot);fd.append("label",label||"");fd.append("file",bl,"foto.jpg");
-    return fx(fd,true);
-  }).then(function(f){
-    URLS[f.path]=f.url;if(D&&D.id===id){D.foto.push({path:f.path,slot:f.slot,label:f.label,ts:f.ts})}
-    return f;
-  }).catch(function(e){toast("Foto non inviata: "+e.message,true);throw e})
+    var f={path:"loc:"+id+":"+Date.now()+"_"+Math.random().toString(36).slice(2,7),slot:slot,label:label||"",ts:new Date().toISOString()};
+    return lfPut({path:f.path,sid:id,slot:f.slot,label:f.label,ts:f.ts,blob:bl}).then(function(){
+      URLS[f.path]=URL.createObjectURL(bl);if(D&&D.id===id){D.foto.push({path:f.path,slot:f.slot,label:f.label,ts:f.ts})}
+      return f});
+  }).catch(function(e){toast("Foto non salvata sul tablet: "+(e&&e.message||e),true);throw e})
   .finally(function(){UPS--;if(D&&D.id===id){setSv();if(STEP===1||STEP===2)renderStep()}});
 }
 function viewFoto(path){
@@ -437,7 +453,7 @@ function viewFoto(path){
   ov.querySelector("#fc").onclick=function(){ov.remove()};
   ov.querySelector("#fd").onclick=function(){
     if(!confirm("Eliminare questa foto?"))return;
-    fx({a:"del",u:S.u,p:S.p,id:D.id,path:path}).then(function(){
+    (isLoc(path)?lfDel(path):fx({a:"del",u:S.u,p:S.p,id:D.id,path:path})).then(function(){
       D.foto=D.foto.filter(function(x){return x.path!==path});
       D.danni.forEach(function(d){if(d.foto===path){d.foto=null;saveSoon()}});
       ov.remove();renderStep();
@@ -505,7 +521,7 @@ function editDanno(i,nw){
       shoot("danno","Danno "+num+" – "+t[1],function(f){
         if(f){d.foto=f.path;if(!document.body.contains(ov)&&i>=0&&D.danni[i]){D.danni[i].foto=f.path;saveSoon()}}
         if(document.body.contains(ov))drawFoto();
-      },function(){ov.querySelector("#dfoto").innerHTML='<div style="display:flex;gap:10px;align-items:center"><div class="spin"></div> Invio foto…</div>'});
+      },function(){ov.querySelector("#dfoto").innerHTML='<div style="display:flex;gap:10px;align-items:center"><div class="spin"></div> Salvo la foto…</div>'});
     };
   };
   drawFoto();
