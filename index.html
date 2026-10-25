@@ -453,9 +453,21 @@ function viewFoto(path){
   var f=D.foto.filter(function(x){return x.path===path})[0]||{};
   var ov=document.createElement("div");ov.className="ov full";
   ov.innerHTML='<img src="'+h(URLS[path]||"")+'" alt=""><div><b>'+h(f.label||f.slot||"")+'</b> <span class="mu sm">'+dt(f.ts)+'</span></div>'+
-    '<div style="display:flex;gap:10px;width:100%;max-width:500px"><button class="b ko" id="fd" style="flex:1">Elimina foto</button><button class="b gh" id="fc" style="flex:1">Chiudi</button></div>';
+    '<div style="display:flex;gap:10px;width:100%;max-width:500px"><button class="b ko" id="fd" style="flex:1">Elimina foto</button><button class="b gh" id="fc" style="flex:1">Chiudi</button></div>'+
+    '<button class="b ac" id="fs" style="width:100%;max-width:500px">Salva nell\'app Foto</button>';
   document.body.appendChild(ov);
   ov.querySelector("#fc").onclick=function(){ov.remove()};
+  var FILE=null,fname=((D.targa||"foto")+"_"+(f.label||f.slot||"foto")+"_"+(f.ts||Date.now())).replace(/[^A-Za-z0-9_-]+/g,"-")+".jpg";
+  if(URLS[path])fetch(URLS[path]).then(function(r){return r.blob()}).then(function(bl){FILE=new File([bl],fname,{type:bl.type||"image/jpeg"})}).catch(function(){});
+  ov.querySelector("#fs").onclick=function(){
+    if(!FILE){toast("Foto non pronta, riprova tra un attimo",true);return}
+    if(navigator.canShare&&navigator.canShare({files:[FILE]})){
+      navigator.share({files:[FILE]}).catch(function(e){if(e&&e.name!=="AbortError")toast("Salvataggio non riuscito: "+(e.message||e.name),true)});
+    }else{
+      var a=document.createElement("a");a.href=URL.createObjectURL(FILE);a.download=fname;document.body.appendChild(a);a.click();a.remove();
+      toast("Foto scaricata nei file del tablet");
+    }
+  };
   ov.querySelector("#fd").onclick=function(){
     if(!confirm("Eliminare questa foto?"))return;
     (isLoc(path)?lfDel(path):fx({a:"del",u:S.u,p:S.p,id:D.id,path:path})).then(function(){
