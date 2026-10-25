@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>Ricambi S.D.Garage</title>
+<style>
+:root{color-scheme:light;--bg:#fff;--card:#f6f7f9;--card2:#eef0f3;--tx:#111827;--mu:#5b6472;--bd:#d6dae0;--bd2:#9aa3af;--ac:#fb923c;--ok:#22c55e;--okt:#15803d;--ko:#ef4444;--kot:#dc2626;--wa:#f59e0b;--bl:#2563eb}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{margin:0;color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.4;padding:14px 18px 60px;max-width:1280px;margin-inline:auto}
+button{font-family:inherit;cursor:pointer;color:inherit}
+h1{font-size:1.35rem;margin:0}h2{font-size:1.1rem;margin:18px 0 8px}
+.mu{color:var(--mu)}.sm{font-size:.85rem}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.brand b{font-size:1.4rem;display:block;line-height:1.1}.brand small{color:var(--mu)}
+.card{background:var(--card);border:2px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px}
+label{display:block;font-weight:700;margin:12px 0 5px;font-size:.92rem}
+input.f,textarea.f,select.f{width:100%;font-size:1rem;padding:10px 12px;border:2px solid var(--bd2);border-radius:9px;background:var(--bg);color:var(--tx);font-family:inherit}
+textarea.f{min-height:70px;resize:vertical}
+input.f:focus,textarea.f:focus,select.f:focus{outline:3px solid var(--ac);border-color:var(--ac)}
+.row{display:grid;gap:10px}.r2{grid-template-columns:1fr 1fr}.r3{grid-template-columns:1fr 1fr 1fr}.r4{grid-template-columns:2fr 1fr 1fr 1fr}
+.row>div{min-width:0}
+.b{padding:11px 16px;font-size:1rem;font-weight:800;border:0;border-radius:10px;background:var(--ok);color:#04210f}
+.b.ac{background:var(--ac);color:#1a0a02}.b.gh{background:transparent;border:2px solid var(--bd2);color:var(--tx)}.b.ko{background:var(--ko);color:#1a0505}.b.bl{background:var(--bl);color:#fff}
+.b:disabled{opacity:.5}
+.btn{padding:7px 12px;border:2px solid var(--bd2);border-radius:9px;background:transparent;font-weight:700;font-size:.9rem}
+.btn:hover{background:var(--card2)}
+.msg{color:var(--kot);font-weight:700;min-height:1.2em;margin-top:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 14px;border:2px solid var(--bd2);border-radius:99px;background:var(--bg);font-weight:700}
+.chip.sel{background:var(--ac);border-color:var(--ac);color:#1a0a02}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 12px}
+.tabs button{padding:10px 14px;border:2px solid var(--bd);border-radius:10px;background:var(--card);font-weight:800}
+.tabs button.sel{background:var(--ac);border-color:var(--ac);color:#1a0a02}
+.tabs .n{display:inline-block;min-width:22px;text-align:center;background:var(--bd);border-radius:99px;padding:0 6px;margin-left:6px;font-size:.85rem}
+.tabs .sel .n{background:#fff}
+table{width:100%;border-collapse:collapse;background:var(--bg);border:2px solid var(--bd);border-radius:12px;overflow:hidden}
+th{text-align:left;font-size:.8rem;color:var(--mu);padding:8px 10px;background:var(--card);border-bottom:2px solid var(--bd)}
+td{padding:9px 10px;border-bottom:1px solid var(--bd);vertical-align:top}
+tr.r{cursor:pointer}tr.r:hover td{background:#fff7ed}
+.tg{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:800;letter-spacing:.06em}
+.cod{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700}
+.pill{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 9px;border-radius:99px;background:var(--bd)}
+.pill.da_cercare{background:#fee2e2;color:#991b1b}.pill.cercato{background:#fef3c7;color:#92400e}.pill.ordinato{background:#dbeafe;color:#1e40af}.pill.arrivato{background:#dcfce7;color:#166534}.pill.annullato{background:#e5e7eb;color:#4b5563}
+.old{background:#fff7ed}
+.grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.r4,.r3{grid-template-columns:1fr 1fr}}
+.cp{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:800;background:var(--bg);border:2px dashed var(--bd2);border-radius:8px;padding:3px 9px;cursor:pointer}
+.cp:hover{border-color:var(--ac)}
+.sup{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.hint{background:#eff6ff;border:2px solid #93c5fd;border-radius:10px;padding:8px 10px;margin-top:6px;font-size:.92rem;cursor:pointer}
+.hint:hover{background:#dbeafe}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#111827;color:#fff;padding:11px 18px;border-radius:10px;font-weight:700;z-index:50}
+.toast.err{background:var(--kot)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-start;justify-content:center;padding:30px 14px;overflow:auto}
+.sheet{background:var(--bg);border-radius:14px;padding:18px;width:100%;max-width:720px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+var API="https://mwkobzsyomdrokuhiztr.supabase.co";
+var KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13a29ienN5b21kcm9rdWhpenRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE4Mjk2NzQsImV4cCI6MjEwNzQwNTY3NH0.A9hM2sDLbhtauY3IxkgnQPv1X6r-dmn_Ypco7WyForM";
+var STATI=[["da_cercare","Da cercare"],["cercato","Trovato, da ordinare"],["ordinato","Ordinato"],["arrivato","Arrivato"]];
+var NEXT={da_cercare:"cercato",cercato:"ordinato",ordinato:"arrivato"};
+var NEXTL={da_cercare:"Trovato ✓",cercato:"Ordinato ✓",ordinato:"Arrivato ✓"};
+var S={u:null,p:null,nome:null},R=[],F=[],SCH=[],TAB="da_cercare",Q="",SEL=null;
+
+function h(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function $(i){return document.getElementById(i)}
+function dt(s){return s?new Date(s).toLocaleDateString("it-IT",{day:"2-digit",month:"2-digit"}):""}
+function eur(n){return n==null||n===""?"":Number(n).toLocaleString("it-IT",{style:"currency",currency:"EUR"})}
+function toast(t,err){var o=document.createElement("div");o.className="toast"+(err?" err":"");o.textContent=t;document.body.appendChild(o);setTimeout(function(){o.remove()},err?4000:1800)}
+function store(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function load(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
+function rpc(fn,a){
+  return fetch(API+"/rest/v1/rpc/"+fn,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify(a||{})})
+  .then(function(r){return r.text().then(function(t){var j=null;try{j=t?JSON.parse(t):null}catch(e){}
+    if(!r.ok)throw new Error((j&&(j.message||j.error))||("Errore "+r.status));return j})})
+  .catch(function(e){if(e instanceof TypeError)throw new Error("Connessione assente");throw e});
+}
+function A(o){var x={p_u:S.u,p_p:S.p};for(var k in o)x[k]=o[k];return x}
+function authFail(e){if(/PIN/.test(e.message)){toast("Sessione scaduta: rientra",true);logout();return true}return false}
+function copia(t){
+  var done=function(){toast("Copiato: "+t)};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){toast("Copia non riuscita",true)});
+  else{var a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");done()}catch(e){toast("Copia non riuscita",true)}a.remove()}
+}
+
+/* ---------- accesso (stesso PIN dell'app di accettazione) ---------- */
+function viewLogin(sel){
+  $("app").innerHTML='<header><div class="brand"><b>Ricambi</b><small>S.D.Garage</small></div></header><div class="card" id="lc" style="max-width:520px"><div class="mu">Caricamento…</div></div>';
+  rpc("acc_users_list").then(function(us){
+    var c=$("lc");
+    var html='<label>Chi sei?</label><div class="chips">'+us.map(function(u){return'<button class="chip'+(sel&&sel.id===u.id?" sel":"")+'" data-u="'+u.id+'">'+h(u.nome)+'</button>'}).join("")+
+      '<button class="chip'+(sel&&sel.id===0?" sel":"")+'" data-u="0">Titolare</button></div>';
+    if(sel){
+      var u=sel.id===0?{id:0,nome:"Titolare",set:true}:us.filter(function(x){return x.id===sel.id})[0];
+      if(u&&!u.set){
+        html+='<label>Primo accesso: scegli il tuo PIN (4-6 cifre)</label><input class="f" id="p1" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">'+
+          '<label>Ripeti il PIN</label><input class="f" id="p2" type="password" inputmode="numeric" maxlength="6" autocomplete="new-password">'+
+          '<div style="margin-top:14px"><button class="b" id="go" data-first="1">Imposta PIN ed entra</button></div>';
+      }else{
+        html+='<label>PIN '+(sel.id===0?"titolare":"di "+h(u?u.nome:""))+'</label><input class="f" id="p1" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password">'+
+          '<div style="margin-top:14px"><button class="b" id="go">Entra</button></div>';
+      }
+    }
+    html+='<div class="msg" id="lm"></div>';
+    c.innerHTML=html;
+    var p1=$("p1");if(p1){p1.focus();p1.addEventListener("keydown",function(e){if(e.key==="Enter")$("go").click()})}
+    c.onclick=function(e){
+      var b=e.target.closest("[data-u]");if(b){viewLogin({id:+b.dataset.u});return}
+      if(e.target.id!=="go")return;
+      var pin=$("p1").value.trim(),m=$("lm");m.textContent="";
+      var go=function(){return rpc("acc_login",{p_u:sel.id,p_p:pin}).then(function(n){S={u:sel.id,p:pin,nome:n};store("acc_s",S);start()})};
+      if(e.target.dataset.first){
+        if(!/^\d{4,6}$/.test(pin)){m.textContent="Il PIN deve avere 4-6 cifre";return}
+        if(pin!==$("p2").value.trim()){m.textContent="I due PIN non coincidono";return}
+        rpc("acc_set_pin",{p_u:sel.id,p_old:"",p_new:pin}).then(go).catch(function(x){m.textContent=x.message});
+      }else go().catch(function(x){m.textContent=x.message});
+    };
+  }).catch(function(e){$("lc").innerHTML='<div class="msg">'+h(e.message)+'</div><button class="b gh" onclick="viewLogin()">Riprova</button>'});
+}
+function logout(){store("acc_s",null);S={u:null,p:null,nome:null};viewLogin()}
+
+/* ---------- elenco richieste ---------- */
+function start(){
+  $("app").innerHTML='<div class="mu">Caricamento…</div>';
+  Promise.all([rpc("ric_list",A({})),rpc("ric_forn_list",A({})),rpc("acc_list",A({p_q:""}))]).then(function(r){
+    R=r[0]||[];F=r[1]||[];SCH=r[2]||[];view();
+  }).catch(function(e){if(!authFail(e))$("app").innerHTML='<div class="msg">'+h(e.message)+'</div><button class="b gh" onclick="start()">Riprova</button>'});
+}
+function reload(keep){
+  return rpc("ric_list",A({})).then(function(r){R=r||[];if(keep!==false)view()}).catch(function(e){if(!authFail(e))toast(e.message,true)});
+}
+function match(r){
+  if(!Q)return true;var q=Q.toLowerCase();
+  return[r.targa,r.marca,r.modello,r.descrizione,r.codice,r.fornitore,r.cliente,r.note].some(function(x){return x&&String(x).toLowerCase().indexOf(q)>=0});
+}
+function view(){
+  var cnt={};STATI.forEach(function(s){cnt[s[0]]=R.filter(function(r){return r.stato===s[0]}).length});
+  var rows=R.filter(function(r){return r.stato===TAB&&match(r)});
+  var now=Date.now();
+  $("app").innerHTML='<header><div class="brand"><b>Ricambi</b><small>S.D.Garage · '+h(S.nome)+'</small></div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="b ac" id="nw">＋ Nuova richiesta</button><button class="btn" id="fo">Fornitori</button><button class="btn" id="rl">Aggiorna</button><button class="btn" id="out">Esci</button></div></header>'+
+    '<input class="f" id="q" placeholder="Cerca targa, modello, ricambio, codice, fornitore…" value="'+h(Q)+'">'+
+    '<div class="tabs">'+STATI.map(function(s){return'<button data-t="'+s[0]+'" class="'+(TAB===s[0]?"sel":"")+'">'+s[1]+'<span class="n">'+cnt[s[0]]+'</span></button>'}).join("")+'</div>'+
+    (rows.length?'<table><thead><tr><th>Auto</th><th>Ricambio</th><th>Codice</th><th>Fornitore</th><th>Prezzo</th><th>Q.</th><th>Data</th><th></th></tr></thead><tbody>'+
+      rows.map(function(r){
+        var vecchia=(r.stato==="da_cercare"||r.stato==="ordinato")&&now-new Date(r.created_at).getTime()>3*86400000;
+        return'<tr class="r'+(vecchia?" old":"")+'" data-id="'+r.id+'"><td><span class="tg">'+h(r.targa||"—")+'</span><div class="sm mu">'+h(((r.marca||"")+" "+(r.modello||"")).trim())+'</div></td>'+
+          '<td>'+h(r.descrizione)+(r.note?'<div class="sm mu">'+h(r.note)+'</div>':'')+'<div class="sm mu">chiesto da '+h(r.richiesto_da||"")+'</div></td>'+
+          '<td class="cod">'+h(r.codice||"")+'</td><td>'+h(r.fornitore||"")+'</td><td>'+eur(r.prezzo)+'</td><td>'+r.qta+'</td>'+
+          '<td class="sm">'+dt(r.stato==="ordinato"?r.ordinato_at:r.stato==="arrivato"?r.arrivato_at:r.created_at)+'</td>'+
+          '<td>'+(NEXT[r.stato]?'<button class="btn" data-n="'+r.id+'">'+NEXTL[r.stato]+'</button>':'')+'</td></tr>'}).join("")+'</tbody></table>'
+      :'<div class="card mu">Nessuna richiesta in questa lista.</div>')+
+    '<div class="sm mu" style="margin-top:8px">Righe arancioni: ferme da più di 3 giorni. Clicca una riga per cercare il codice, aggiungere prezzo e fornitore.</div>';
+  $("out").onclick=logout;$("rl").onclick=function(){reload()};$("nw").onclick=function(){editor(null)};$("fo").onclick=fornitori;
+  $("q").oninput=function(){Q=this.value;var p=this.selectionStart;view();var q=$("q");q.focus();q.setSelectionRange(p,p)};
+  document.querySelector(".tabs").onclick=function(e){var b=e.target.closest("[data-t]");if(b){TAB=b.dataset.t;view()}};
+  var tb=document.querySelector("tbody");
+  if(tb)tb.onclick=function(e){
+    var n=e.target.closest("[data-n]");
+    if(n){e.stopPropagation();var r=R.filter(function(x){return x.id===n.dataset.n})[0];n.disabled=true;
+      rpc("ric_save",A({p_r:{id:r.id,descrizione:r.descrizione,codice:r.codice,fornitore:r.fornitore,prezzo:r.prezzo,qta:r.qta,note:r.note,stato:NEXT[r.stato]}})).then(function(){toast("Spostata in: "+STATI.filter(function(s){return s[0]===NEXT[r.stato]})[0][1]);return reload()}).catch(function(x){if(!authFail(x))toast(x.message,true);n.disabled=false});return}
+    var tr=e.target.closest("tr.r");if(tr)editor(tr.dataset.id);
+  };
+}
+
+/* ---------- richiesta: nuova / modifica / ricerca codice ---------- */
+function urlFor(f,q){return f.url?f.url.replace(/\{q\}/g,encodeURIComponent(q)):null}
+function editor(id){
+  var r=id?R.filter(function(x){return x.id===id})[0]:null;
+  var isNew=!r;r=r||{stato:"da_cercare",qta:1};
+  var ov=document.createElement("div");ov.className="ov";
+  var autoSel=isNew?'<label>Auto (dalle accettazioni recenti)</label><select class="f" id="sc"><option value="">— scegli l\'auto o scrivi la targa sotto —</option>'+
+      SCH.map(function(s){return'<option value="'+s.id+'" data-t="'+h(s.targa||"")+'" data-m="'+h(((s.marca||"")+" "+(s.modello||"")).trim())+'">'+h((s.targa||"?")+" · "+((s.marca||"")+" "+(s.modello||"")).trim()+(s.cliente_nome?" · "+s.cliente_nome:""))+'</option>'}).join("")+'</select>'+
+      '<label>Oppure solo targa</label><input class="f" id="tg" placeholder="es. GP709FS" style="text-transform:uppercase">':'';
+  var info=!isNew?'<div class="card" style="background:#fff"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="cp" data-c="'+h(r.targa||"")+'" title="Copia targa">'+h(r.targa||"—")+'</span>'+
+      '<b>'+h(((r.marca||"")+" "+(r.modello||"")).trim())+'</b>'+(r.cliente?'<span class="mu">· '+h(r.cliente)+'</span>':'')+'</div>'+
+      (r.telaio?'<div style="margin-top:8px" class="sm">Telaio: <span class="cp" data-c="'+h(r.telaio)+'" title="Copia telaio">'+h(r.telaio)+'</span></div>':'<div class="sm mu" style="margin-top:6px">Telaio non indicato sulla scheda.</div>')+'</div>':'';
+  ov.innerHTML='<div class="sheet"><div style="display:flex;justify-content:space-between;align-items:center"><h1>'+(isNew?"Nuova richiesta ricambio":"Richiesta ricambio")+'</h1><button class="btn" id="x">Chiudi</button></div>'+
+    autoSel+info+
+    '<label>Cosa serve</label><input class="f" id="ds" value="'+h(r.descrizione||"")+'" placeholder="es. pastiglie freno anteriori">'+
+    '<div class="row r4"><div><label>Codice ricambio</label><input class="f" id="cd" value="'+h(r.codice||"")+'"></div><div><label>Fornitore</label><input class="f" id="fn" list="fl" value="'+h(r.fornitore||"")+'"></div>'+
+    '<div><label>Prezzo €</label><input class="f" id="pz" inputmode="decimal" value="'+(r.prezzo==null?"":String(r.prezzo).replace(".",","))+'"></div><div><label>Quantità</label><input class="f" id="qt" inputmode="numeric" value="'+(r.qta||1)+'"></div></div>'+
+    '<datalist id="fl">'+F.map(function(f){return'<option value="'+h(f.nome)+'">'}).join("")+'</datalist>'+
+    '<label>Note</label><textarea class="f" id="nt">'+h(r.note||"")+'</textarea>'+
+    '<label>Stato</label><div class="chips" id="st">'+STATI.concat([["annullato","Annullato"]]).map(function(s){return'<button class="chip'+(r.stato===s[0]?" sel":"")+'" data-s="'+s[0]+'">'+s[1]+'</button>'}).join("")+'</div>'+
+    '<h2>Cerca il ricambio</h2><div class="row r2" style="grid-template-columns:1fr auto"><input class="f" id="sq" placeholder="codice o descrizione da cercare"><button class="btn" id="sqc">Copia</button></div>'+
+    '<div class="sup" id="sup"></div><div id="sto"></div>'+
+    '<div class="msg" id="em"></div><div style="display:flex;gap:10px;margin-top:10px"><button class="b" id="sv">Salva</button></div></div>';
+  document.body.appendChild(ov);
+  var stato=r.stato;
+  var auto=function(){
+    if(r.id)return((r.marca||"")+" "+(r.modello||"")).trim();
+    var o=$("sc")&&$("sc").selectedOptions[0];return o&&o.value?o.dataset.m:"";
+  };
+  var buildSup=function(){
+    var q=$("sq").value.trim();
+    var bt=F.filter(function(f){return f.url}).map(function(f){return'<button class="btn" data-u="'+h(urlFor(f,q||auto()||$("ds").value))+'" title="'+h(f.note||"")+'">'+h(f.nome)+' ↗</button>'}).join("");
+    var g=(q||(($("ds").value+" "+auto()).trim()));
+    $("sup").innerHTML=bt+'<button class="btn" data-u="https://www.google.com/search?q='+encodeURIComponent(g+" codice ricambio")+'">Google ↗</button><button class="btn" data-u="https://www.google.com/search?tbm=isch&q='+encodeURIComponent(g+" ricambio")+'">Immagini ↗</button>'+
+      (F.length?'':'<span class="sm mu">Aggiungi i tuoi fornitori da "Fornitori" per avere qui i collegamenti diretti.</span>');
+  };
+  var storico=function(){
+    var q=(auto()||$("ds").value||"").trim();
+    if(q.length<2){$("sto").innerHTML="";return}
+    rpc("ric_storico",A({p_q:$("ds").value.trim().length>2?$("ds").value.trim():q})).then(function(l){
+      $("sto").innerHTML=(l&&l.length)?'<div class="sm mu" style="margin-top:12px"><b>Già usati in passato</b> (clicca per riusare)</div>'+l.map(function(x,i){return'<div class="hint" data-i="'+i+'"><b>'+h(x.descrizione)+'</b> · <span class="cod">'+h(x.codice)+'</span>'+(x.fornitore?" · "+h(x.fornitore):"")+(x.prezzo!=null?" · "+eur(x.prezzo):"")+'<div class="sm mu">'+h(((x.marca||"")+" "+(x.modello||"")).trim()||x.targa||"")+' · '+dt(x.data)+'</div></div>'}).join(""):"";
+      $("sto").onclick=function(e){var t=e.target.closest("[data-i]");if(!t)return;var x=l[+t.dataset.i];$("cd").value=x.codice||"";if(x.fornitore)$("fn").value=x.fornitore;if(x.prezzo!=null)$("pz").value=String(x.prezzo).replace(".",",");if(!$("ds").value)$("ds").value=x.descrizione;if(stato==="da_cercare")pick("cercato");$("sq").value=x.codice||"";buildSup()};
+    }).catch(function(){});
+  };
+  var pick=function(s){stato=s;[].forEach.call(document.querySelectorAll("#st .chip"),function(b){b.classList.toggle("sel",b.dataset.s===s)})};
+  $("sq").value=r.codice||r.descrizione||"";buildSup();storico();
+  $("x").onclick=function(){ov.remove()};
+  ov.addEventListener("mousedown",function(e){ov._d=e.target===ov});
+  ov.addEventListener("click",function(e){if(e.target===ov&&ov._d)ov.remove();var c=e.target.closest("[data-c]");if(c&&c.dataset.c)copia(c.dataset.c);var u=e.target.closest("[data-u]");if(u)window.open(u.dataset.u,"_blank","noopener")});
+  $("st").onclick=function(e){var b=e.target.closest("[data-s]");if(b)pick(b.dataset.s)};
+  $("sq").oninput=buildSup;$("ds").oninput=function(){if(!$("sq").value)buildSup()};
+  $("sqc").onclick=function(){if($("sq").value)copia($("sq").value)};
+  $("cd").onchange=function(){if($("cd").value&&!$("sq").value.trim()){$("sq").value=$("cd").value;buildSup()}};
+  if($("sc"))$("sc").onchange=function(){var o=this.selectedOptions[0];if(o&&o.value)$("tg").value=o.dataset.t;buildSup();storico()};
+  $("sv").onclick=function(){
+    var m=$("em");m.textContent="";
+    var body={id:r.id||"",scheda_id:r.scheda_id||($("sc")&&$("sc").value)||"",targa:r.targa||($("tg")&&$("tg").value)||"",descrizione:$("ds").value,codice:$("cd").value,fornitore:$("fn").value,
+      prezzo:$("pz").value.replace(",",".").trim(),qta:$("qt").value,note:$("nt").value,stato:stato};
+    if(body.codice&&stato==="da_cercare")body.stato="cercato";
+    if(body.prezzo&&isNaN(Number(body.prezzo))){m.textContent="Prezzo non valido";return}
+    this.disabled=true;var b=this;
+    rpc("ric_save",A({p_r:body})).then(function(){ov.remove();toast("Salvato");return reload()}).catch(function(x){if(!authFail(x))m.textContent=x.message;b.disabled=false});
+  };
+  setTimeout(function(){var f=$(isNew?"sc":"ds");if(f)f.focus()},30);
+}
+
+/* ---------- fornitori ---------- */
+function fornitori(){
+  var ov=document.createElement("div");ov.className="ov";
+  var draw=function(){
+    ov.innerHTML='<div class="sheet"><div style="display:flex;justify-content:space-between;align-items:center"><h1>Fornitori</h1><button class="btn" id="x">Chiudi</button></div>'+
+      '<p class="sm mu">Per avere un pulsante di ricerca diretta, incolla l\'indirizzo della pagina di ricerca del fornitore e al posto del termine cercato scrivi <b>{q}</b>.<br>Esempio: <span class="cod">https://www.sito.it/cerca?q={q}</span>. Per trovare l\'indirizzo: cerca una cosa qualsiasi sul sito e copia l\'indirizzo dalla barra del browser, poi sostituisci quello che hai cercato con {q}.</p>'+
+      (F.length?F.map(function(f){return'<div class="card"><div class="row r2"><div><label>Nome</label><input class="f" data-k="nome" data-id="'+f.id+'" value="'+h(f.nome)+'"></div><div><label>Indirizzo di ricerca (con {q})</label><input class="f" data-k="url" data-id="'+f.id+'" value="'+h(f.url||"")+'"></div></div>'+
+        '<div style="display:flex;gap:8px;margin-top:10px"><button class="btn" data-sv="'+f.id+'">Salva</button><button class="btn" data-off="'+f.id+'">Rimuovi</button></div></div>'}).join(""):'<div class="card mu">Nessun fornitore ancora.</div>')+
+      '<h2>Aggiungi fornitore</h2><div class="card"><div class="row r2"><div><label>Nome</label><input class="f" id="nn"></div><div><label>Indirizzo di ricerca (con {q})</label><input class="f" id="nu" placeholder="https://…{q}"></div></div><div style="margin-top:10px"><button class="b" id="na">Aggiungi</button></div></div><div class="msg" id="fm"></div></div>';
+    $("x").onclick=function(){ov.remove();view()};
+    $("na").onclick=function(){save({nome:$("nn").value,url:$("nu").value})};
+    ov.onclick=function(e){var s=e.target.closest("[data-sv]"),o=e.target.closest("[data-off]");
+      var g=function(id,k){return ov.querySelector('[data-id="'+id+'"][data-k="'+k+'"]').value};
+      if(s)save({id:s.dataset.sv,nome:g(s.dataset.sv,"nome"),url:g(s.dataset.sv,"url")});
+      if(o&&confirm("Rimuovere questo fornitore dall'elenco?"))save({id:o.dataset.off,nome:g(o.dataset.off,"nome"),url:g(o.dataset.off,"url"),attivo:false})};
+  };
+  var save=function(f){
+    if(f.url&&f.url.indexOf("{q}")<0&&!confirm("Nell'indirizzo manca {q}: il pulsante aprirà sempre la stessa pagina. Salvare lo stesso?"))return;
+    rpc("ric_forn_save",A({p_f:f})).then(function(){return rpc("ric_forn_list",A({}))}).then(function(l){F=l||[];draw();toast("Salvato")}).catch(function(e){if(!authFail(e))$("fm").textContent=e.message});
+  };
+  document.body.appendChild(ov);draw();
+}
+
+(function(){var s=load("acc_s");if(s&&s.u!=null&&s.p){S=s;rpc("acc_login",{p_u:s.u,p_p:s.p}).then(function(n){S.nome=n;start()}).catch(function(e){if(/PIN/.test(e.message))logout();else start()})}else viewLogin()})();
+</script>
+</body>
+</html>

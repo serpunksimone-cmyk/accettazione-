@@ -9,3 +9,5 @@ App per l'accettazione veicoli: dati auto e cliente, foto guidate, danni sul dis
 - Titolare: entra con lo stesso PIN del timbratore; operatori scelgono il PIN al primo accesso
 - Pubblicazione: ogni push su `main` viene pubblicato automaticamente da Vercel
 - Tempi di lavoro (solo titolare): nella scheda, sotto lo storico, i tempi delle timbrature del timbratore per la stessa targa dalla data dell'accettazione (funzione `acc_ore`, migration `20261021_acc_ore.sql` nel repo `timbratore`). Timer rosso oltre l'obiettivo (Tagliando 2 h).
+
+- Ricambi (per chi cerca i ricambi): https://accettazione.sdautogroup.it/ricambi — pagina `ricambi/index.html`, stesso accesso e PIN dell'accettazione. Richieste ricambio per auto con stati (da cercare → trovato → ordinato → arrivato), codice/fornitore/prezzo, collegamenti di ricerca ai fornitori (configurabili, con `{q}`), storico dei codici già usati per lo stesso modello. Tabelle `ric_richieste`, `ric_fornitori`, funzioni `ric_*` (migration `supabase/migrations/20261025_ricambi.sql`).
