@@ -91,6 +91,21 @@ input.targa{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:800;le
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:110px;background:#111827;color:#fff;border:2px solid var(--bd2);padding:10px 16px;border-radius:12px;z-index:30;font-weight:700;max-width:90vw}
 .toast.err{border-color:var(--ko);color:#fecaca}
 .pin{letter-spacing:.4em;text-align:center;font-size:1.6rem}
+/* lavori e tempi */
+.lv{background:var(--bg);border:2px solid var(--bd);border-left:8px solid var(--wa);border-radius:12px;padding:10px;margin-bottom:10px}
+.lv.ok{border-left-color:var(--ok)}
+.lv .r1{display:flex;gap:8px;align-items:center}.lv .r1 input{flex:1;min-width:0}
+.lv .r2{display:grid;grid-template-columns:1fr 110px;gap:8px;margin-top:8px}.lv .r3{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.lv input.f,.lv select.f{min-height:46px;font-size:1rem;padding:9px}
+.lv .tm{text-align:center;font-weight:800;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:.72rem;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--card2);color:var(--mu);margin-right:6px}
+.tag.ok{background:var(--ok);color:#04210f}.tag.wa{background:var(--wa);color:#1f1300}
+.lvb{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.mic{font-size:1.6rem;min-width:64px;border-radius:12px;border:2px solid var(--bd2);background:var(--bg)}
+.mic.on{background:var(--ko);border-color:var(--ko);color:#fff;animation:pl 1.2s infinite}
+@keyframes pl{50%{opacity:.6}}
+.tot{font-size:1.1rem;font-weight:800}
+@media(max-width:520px){.lv .r2,.lv .r3{grid-template-columns:1fr}}
 #print{display:none}
 @media print{
   body{background:#fff;color:#000;padding:0;max-width:none;font-size:11pt}
@@ -119,9 +134,10 @@ var SLOTS=[["fronte","Fronte"],["retro","Retro"],["sx","Lato sinistro"],["dx","L
 var TIPI=[["graffio","Graffio","#facc15"],["ammaccatura","Ammaccatura","#fb923c"],["rottura","Rotto / crepato","#ef4444"],["vite","Vite / fissaggio","#c084fc"],["specchietto","Specchietto","#60a5fa"],["vetro","Vetro","#22d3ee"],["ruggine","Ruggine","#b45309"],["altro","Altro","#9ca3af"]];
 var CK=[["carrozzeria","Carrozzeria"],["paraurti","Paraurti"],["specchietti","Specchietti"],["fari","Fari e frecce"],["vetri","Parabrezza e vetri"],["tergi","Tergicristalli"],["cerchi","Cerchi"],["gomme","Pneumatici"],["viti","Viti e fissaggi (carter, paraurti, targhe)"],["interni","Interni e sedili"],["spie","Spie cruscotto spente"],["ruotino","Ruotino / kit gonfiaggio"]];
 var CARB=["Riserva","1/4","1/2","3/4","Pieno"];
-var STEPS=["Veicolo","Foto","Danni","Controlli","Firma"];
+var STEPS=["Veicolo","Foto","Danni","Controlli","Firma","Lavori"];
 
 var S={u:null,p:null,nome:null};
+var DEEP=(location.hash.match(/s=([0-9a-f-]{36})/i)||[])[1]||null;if(DEEP){try{history.replaceState(null,"",location.pathname)}catch(e){}}
 var D=null,STEP=0,URLS={},SAVE_T=null,SAVING=null,DIRTY=false,HIST=null,UPS=0,Q="",SLOT_PICK=null;
 
 function h(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -206,12 +222,14 @@ function authFail(e){if(/PIN/.test(e.message)){toast("Sessione scaduta: rientra"
 function viewList(){
   D=null;HIST=null;window.scrollTo(0,0);
   $("app").innerHTML='<header><div class="brand"><b>Accettazione</b><small>S.D.Garage · '+h(S.nome)+'</small></div>'+
-    '<div style="display:flex;gap:8px">'+(S.u===0?'<button class="btn" id="adm">Operatori</button>':'')+'<button class="btn" id="out">Esci</button></div></header>'+
+    '<div style="display:flex;gap:8px">'+(S.u===0?'<button class="btn" id="tmp">Tempario</button><button class="btn" id="adm">Operatori</button>':'')+'<button class="btn" id="out">Esci</button></div></header>'+
     '<button class="b ac" id="nw" style="font-size:1.25rem">＋ Nuova accettazione</button>'+
     '<div style="margin:16px 0 12px"><input class="f" id="q" placeholder="Cerca targa, cliente o modello" value="'+h(Q)+'"></div>'+
     '<div id="ls"><div class="mu">Caricamento…</div></div>';
   $("out").onclick=logout;
   if($("adm"))$("adm").onclick=viewAdmin;
+  if($("tmp"))$("tmp").onclick=viewTempario;
+  if(DEEP){var dp=DEEP;DEEP=null;openScheda(dp,5);return}
   $("nw").onclick=function(){this.disabled=true;rpc("acc_new",A({})).then(function(id){openScheda(id,0)}).catch(function(e){if(!authFail(e))toast(e.message,true);$("nw").disabled=false})};
   var t;$("q").oninput=function(){Q=this.value.trim();clearTimeout(t);t=setTimeout(fillList,300)};
   fillList();
@@ -289,14 +307,14 @@ function head(){
   setSv();
 }
 function setSv(){var e=$("sv");if(!e)return;e.textContent=UPS?"Salvo foto… ("+UPS+")":SAVING||DIRTY?"Salvataggio…":D.stato==="chiusa"?"Completa ✓":"Salvato ✓"}
-function go(i){flush();STEP=i;window.scrollTo(0,0);renderStep()}
+function go(i){flush();if(REC)REC.stop();STEP=i;window.scrollTo(0,0);renderStep()}
 function renderStep(){
   if(!D||!$("body"))return;head();
-  [stepVeicolo,stepFoto,stepDanni,stepControlli,stepFirma][STEP]($("body"));
+  [stepVeicolo,stepFoto,stepDanni,stepControlli,stepFirma,stepLavori][STEP]($("body"));
 }
 
 /* salvataggio automatico */
-function payload(){var o={};["targa","marca","modello","telaio","km","carburante","cliente_nome","cliente_tel","cliente_email","richiesta","oggetti","note","lavaggio","chiavi","riconsegna","checklist","danni"].forEach(function(k){o[k]=D[k]==null?"":D[k]});return o}
+function payload(){var o={};["targa","marca","modello","motore","telaio","km","carburante","cliente_nome","cliente_tel","cliente_email","richiesta","oggetti","note","lavaggio","chiavi","riconsegna","checklist","danni"].forEach(function(k){o[k]=D[k]==null?"":D[k]});return o}
 function saveSoon(){DIRTY=true;setSv();clearTimeout(SAVE_T);SAVE_T=setTimeout(flush,700)}
 function flush(){
   clearTimeout(SAVE_T);
@@ -328,6 +346,7 @@ function stepVeicolo(b){
   b.innerHTML='<div class="card"><label>Targa</label><input class="f targa" data-f="targa" value="'+h(D.targa)+'" placeholder="AB123CD" autocomplete="off" autocapitalize="characters">'+
     '<div id="hist"></div><div id="ore"></div>'+
     '<div class="row"><div><label>Marca</label><input class="f" data-f="marca" value="'+h(D.marca)+'" placeholder="Fiat"></div><div><label>Modello</label><input class="f" data-f="modello" value="'+h(D.modello)+'" placeholder="Panda"></div></div>'+
+    '<label>Motore</label><input class="f" data-f="motore" value="'+h(D.motore)+'" placeholder="Es. 1.3 Multijet Euro 6" autocomplete="off"><div class="mu sm" style="margin-top:4px">Serve per calcolare i tempi di lavoro.</div>'+
     '<div class="row"><div><label>Km</label><input class="f" data-f="km" inputmode="numeric" value="'+h(D.km)+'" placeholder="123456"></div><div><label>Chiavi consegnate</label><div class="seg" id="chiavi">'+[1,2,3].map(function(n){return'<button data-v="'+n+'" class="'+(+D.chiavi===n?"sel":"")+'">'+n+'</button>'}).join("")+'</div></div></div>'+
     '<div id="kmw"></div>'+
     '<label>Carburante</label><div class="seg" id="carb">'+CARB.map(function(c,i){return'<button data-v="'+i+'" class="'+(D.carburante!=null&&+D.carburante===i?"sel":"")+'">'+c+'</button>'}).join("")+'</div>'+
@@ -344,7 +363,7 @@ function stepVeicolo(b){
   $("chiavi").onclick=function(e){var t=e.target.closest("[data-v]");if(!t)return;D.chiavi=+t.dataset.v;this.querySelectorAll("button").forEach(function(x){x.classList.toggle("sel",x===t)});saveSoon()};
   drawHist();kmWarn();loadOre();
 }
-var TARGETS={"Tagliando":120};
+var TARGETS={"Tagliando":120,"Diagnosi":180};
 function oreMin(e){var end=e.t_out||Date.now();return Math.max(0,(end-e.t_in-(e.paused_ms||0)-((e.paused&&!e.t_out)?Date.now()-e.paused:0))/60000)}
 function oreFmt(m){m=Math.round(m);return Math.floor(m/60)+"h "+("0"+(m%60)).slice(-2)+"m"}
 function loadOre(){
@@ -356,8 +375,8 @@ function loadOre(){
     var tot=0,per={};o.forEach(function(x){var m=oreMin(x);tot+=m;var k=x.name;per[k]=(per[k]||0)+m});
     e2.innerHTML='<div class="hist" style="background:#f6f7f9;border-color:var(--bd)"><b style="color:var(--tx)">Tempi di lavoro</b> · totale <b style="color:var(--tx)">'+oreFmt(tot)+'</b>'+
       '<div class="mu sm" style="margin-top:4px">'+Object.keys(per).map(function(k){return h(k)+' '+oreFmt(per[k])}).join(' · ')+'</div>'+
-      '<div style="margin-top:8px">'+o.map(function(x){var m=oreMin(x),lim=TARGETS[x.type],red=lim&&m>lim;
-        return'<div class="ck" style="padding:6px 0"><div class="nm" style="min-width:0">'+dt(x.t_in,false)+' · '+h(x.name)+(x.da?' <span class="mu sm">(da '+h(x.da)+')</span>':'')+'<div class="mu sm">'+h(x.type||"")+(x.descr?' · '+h(x.descr):'')+(x.t_out?'':' · in corso')+'</div></div><b style="'+(red?'color:#dc2626':'')+'">'+oreFmt(m)+(red?' ⏱':'')+'</b></div>'}).join('')+'</div></div>';
+      '<div style="margin-top:8px">'+o.map(function(x){var m=oreMin(x),lim=x.obj_min||TARGETS[x.type],red=lim&&m>lim;
+        return'<div class="ck" style="padding:6px 0"><div class="nm" style="min-width:0">'+dt(x.t_in,false)+' · '+h(x.name)+(x.da?' <span class="mu sm">(da '+h(x.da)+')</span>':'')+'<div class="mu sm">'+h(x.type||"")+(x.descr?' · '+h(x.descr):'')+(lim?' · max '+oreFmt(lim):'')+(x.t_out?'':' · in corso')+'</div></div><b style="'+(red?'color:#dc2626':'')+'">'+oreFmt(m)+(red?' ⏱':'')+'</b></div>'}).join('')+'</div></div>';
   }).catch(function(){})
 }
 function loadHist(){
@@ -653,6 +672,116 @@ function initSig(){
     var data=o.toDataURL("image/png");
     rpc("acc_firma",A({p_id:D.id,p_firma:data})).then(function(){D.firma=data;D.firmata_at=new Date().toISOString();stepFirma($("body"))}).catch(function(e){toast(e.message,true)});
   };
+}
+
+/* --- 6 lavori e tempi --- */
+var TIPIL=["Tagliando","Freni","Diagnosi","Gomme","Frizione","Distribuzione","Sospensioni","Altro"];
+var FN2=API+"/functions/v1/stima-lavori";
+var LAV=null,LAVID=null,LAVSAVE=Promise.resolve(),REC=null,LAVMSG="",LTXT="";
+function tFmt(m){if(m==null||m==="")return"";m=+m;return Math.floor(m/60)+":"+("0"+m%60).slice(-2)}
+function tParse(v){v=String(v||"").trim().toLowerCase().replace(",",".");if(!v)return null;var m;
+  if((m=v.match(/^(\d{1,3}):(\d{1,2})$/))&&+m[2]<60)return +m[1]*60+ +m[2];
+  if((m=v.match(/^(\d{1,3})\s*h\s*(\d{1,2})?\s*(m|min)?$/))&&(!m[2]||+m[2]<60))return +m[1]*60+(m[2]?+m[2]:0);
+  if(m=v.match(/^(\d{1,4})\s*(m|min|minuti)$/))return +m[1];
+  if(/^\d{1,3}(\.\d+)?$/.test(v))return Math.round(parseFloat(v)*60);
+  return NaN}
+function lavKey(t){return String(t||"").toLowerCase().replace(/[^a-z0-9]/g,"")}
+function lavTot(){var a=0,p=0;(LAV||[]).forEach(function(l){if(l.minuti){if(l.stato==="approvato")a+=+l.minuti;else p+=+l.minuti}});return{a:a,p:p}}
+function drawLav(){
+  var el=$("lvl");if(!el)return;var own=S.u===0;
+  var f=document.activeElement,fi=f&&f.closest&&f.closest(".lv")?f.closest(".lv").dataset.i:null,fk=f&&f.dataset?f.dataset.k:null,pos=null;try{pos=f.selectionStart}catch(e){}
+  if(!LAV){el.innerHTML='<div class="mu">Caricamento…</div>';return}
+  var FNM={tempario:"Tempario",fisso:"Tempo fisso",stima:"Stima AI",manuale:"A mano"};
+  el.innerHTML=(LAV.length?LAV.map(function(l,i){var ok=l.stato==="approvato",ro=ok&&!own,fm=l.fatto_ms?Math.round(l.fatto_ms/60000):0,ov=l.minuti&&fm>l.minuti,dis=ro?" disabled":"";
+    return'<div class="lv'+(ok?" ok":"")+'" data-i="'+i+'"><div style="margin-bottom:6px"><span class="tag '+(ok?"ok":"wa")+'">'+(ok?"Approvato":"Da approvare")+'</span>'+(l.fonte?'<span class="tag">'+h(FNM[l.fonte]||l.fonte)+'</span>':'')+
+      (fm?'<span class="tag"'+(ov?' style="background:var(--ko);color:#fff"':'')+'>Lavorato '+oreFmt(fm)+(ov?' ⏱':'')+'</span>':'')+'</div>'+
+      '<div class="r1"><input class="f" data-k="titolo" value="'+h(l.titolo)+'" placeholder="Lavoro da fare"'+dis+'>'+(ro?'':'<button class="btn del" data-x="'+i+'" aria-label="Elimina lavoro">✕</button>')+'</div>'+
+      '<div class="r2"><select class="f" data-k="tipo"'+dis+'>'+TIPIL.map(function(t){return'<option'+(t===l.tipo?" selected":"")+'>'+t+'</option>'}).join("")+'</select>'+
+      '<input class="f tm" data-k="minuti" value="'+tFmt(l.minuti)+'" placeholder="ore h:mm" inputmode="decimal" aria-label="Tempo massimo"'+dis+'></div>'+
+      '<div class="r3"><input class="f" data-k="esterno" value="'+h(l.esterno)+'" placeholder="Lavoro esterno (es. rettifica testata)"'+dis+'><input class="f" data-k="nota" value="'+h(l.nota)+'" placeholder="Nota per il meccanico"'+dis+'></div>'+
+      (own?'<div class="lvb"><button class="btn" data-ap="'+i+'">'+(ok?"Togli approvazione":"✓ Approva")+'</button></div>':'')+'</div>'}).join(""):
+    '<div class="mu">Nessun lavoro. Detta o scrivi qui sopra e tocca «Calcola tempi».</div>')+
+    (own&&LAV.some(function(l){return l.stato!=="approvato"})?'<button class="b" id="apall" style="margin-top:6px">✓ Approva tutti</button>':'')+
+    '<button class="btn" id="add1" style="margin-top:10px">＋ Aggiungi a mano</button>'+
+    (own?'<div class="mu sm" style="margin-top:10px">I lavori approvati compaiono nel timbratore scrivendo la targa. Il tempo approvato entra nel tempario per questo motore e la prossima volta è già pronto.</div>':
+      '<div class="mu sm" style="margin-top:10px">Li approva il titolare: solo allora compaiono ai meccanici.</div>');
+  var t=lavTot(),te=$("tot");if(te)te.textContent=(t.a?"Approvati "+oreFmt(t.a):"")+(t.p?(t.a?" · ":"")+"da approvare "+oreFmt(t.p):"");
+  if(fi!=null&&fk){var n=el.querySelector('.lv[data-i="'+fi+'"] [data-k="'+fk+'"]');if(n&&!n.disabled){n.focus();try{if(pos!=null)n.setSelectionRange(pos,pos)}catch(e){}}}
+}
+function saveLav(){
+  var id=D.id,send=LAV.filter(function(l){return l.titolo&&l.titolo.trim()}),empty=LAV.filter(function(l){return!(l.titolo&&l.titolo.trim())});
+  var body=send.map(function(l){return{id:l.id||null,titolo:l.titolo,tipo:l.tipo,minuti:l.minuti,esterno:l.esterno||"",nota:l.nota||"",stato:l.stato,fonte:l.fonte||""}});
+  LAVSAVE=LAVSAVE.then(function(){return rpc("acc_lavori_set",A({p_id:id,p_l:body}))}).then(function(r){if(D&&D.id===id){LAV=r.concat(empty);drawLav()}})
+    .catch(function(e){if(!authFail(e)){toast(e.message,true);if(D&&D.id===id)return rpc("acc_lavori_get",A({p_id:id})).then(function(r){LAV=r.concat(empty);drawLav()})}}).catch(function(){});
+  return LAVSAVE;
+}
+function stepLavori(b){
+  if(LAVID!==D.id){LAV=null;LAVID=D.id;LAVMSG="";LTXT="";
+    rpc("acc_lavori_get",A({p_id:D.id})).then(function(r){if(D&&D.id===LAVID){LAV=r;drawLav()}}).catch(function(e){if(!authFail(e))toast(e.message,true)})}
+  var own=S.u===0,auto=[D.marca,D.modello].filter(Boolean).join(" "),SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  b.innerHTML='<div class="card"><b>'+h(auto||"Auto non indicata")+'</b>'+(D.motore?' · motore <b>'+h(D.motore)+'</b>':'')+(D.km?' · km '+h((+D.km).toLocaleString("it-IT")):'')+
+    (D.motore?'':'<div class="hist warn">Manca il motore: inseriscilo nel passo 1 (Veicolo). Serve per i tempi.</div>')+
+    (D.richiesta?'<div class="mu" style="margin-top:6px">Richiesta del cliente: '+h(D.richiesta)+'</div>':'')+'</div>'+
+    '<div class="card"><label style="margin-top:0">'+(own?"Detta o scrivi cosa c'è da fare":"Lavori da proporre al titolare")+'</label>'+
+    '<div style="display:flex;gap:8px;align-items:stretch">'+(SR?'<button class="mic'+(REC?" on":"")+'" id="mic" aria-label="Detta">🎤</button>':'')+
+    '<textarea class="f" id="lt" placeholder="Es. sostituzione fasce elastiche, controllo turbina" style="min-height:76px">'+h(LTXT)+'</textarea></div>'+
+    (SR?'<div class="mu sm" style="margin-top:4px">Tocca 🎤, parla, poi toccalo di nuovo per fermare.</div>':'<div class="mu sm" style="margin-top:4px">Per dettare usa il microfono della tastiera.</div>')+
+    '<div class="lvb"><button class="b ac" id="calc" style="flex:2;min-width:180px">Calcola tempi</button>'+(D.richiesta?'<button class="btn" id="rich">Usa la richiesta del cliente</button>':'')+'</div>'+
+    (LAVMSG?'<div class="mu sm" style="margin-top:8px">'+h(LAVMSG)+'</div>':'')+'</div>'+
+    '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Lavori</b><span class="tot" id="tot"></span></div><div id="lvl" style="margin-top:10px"></div></div>';
+  drawLav();
+  $("lt").oninput=function(){LTXT=this.value};
+  if($("rich"))$("rich").onclick=function(){var v=$("lt").value.trim();$("lt").value=LTXT=(v?v+", ":"")+D.richiesta};
+  if(SR)$("mic").onclick=function(){
+    if(REC){REC.stop();return}
+    var r=new SR(),me=this,base=$("lt").value.trim();base=base?base+", ":"";
+    r.lang="it-IT";r.interimResults=true;r.continuous=true;
+    r.onresult=function(e){var t="";for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;var el=$("lt");if(el){el.value=base+t.trim();LTXT=el.value}};
+    r.onerror=function(e){toast(e.error==="not-allowed"||e.error==="service-not-allowed"?"Permetti l'uso del microfono al browser, poi riprova":"Dettatura non riuscita ("+e.error+")",true)};
+    r.onend=function(){REC=null;var m=$("mic");if(m)m.classList.remove("on")};
+    try{r.start();REC=r;me.classList.add("on")}catch(x){toast("Dettatura non disponibile: usa il microfono della tastiera",true)}
+  };
+  $("calc").onclick=function(){
+    if(REC)REC.stop();
+    var t=$("lt").value.trim(),bt=this,id=D.id;if(!t){toast("Scrivi o detta i lavori",true);return}
+    if(!LAV){toast("Attendi il caricamento dei lavori",true);return}
+    bt.disabled=true;bt.textContent="Calcolo i tempi…";
+    flush().then(function(){return fetch(FN2,{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({u:S.u,p:S.p,id:id,testo:t})})})
+    .then(function(r){return r.json().catch(function(){return{}}).then(function(j){if(!r.ok||j.error)throw new Error(j.error||("Errore "+r.status));return j})})
+    .then(function(r){if(!D||D.id!==id)return;var have={},n=0;LAV.forEach(function(l){have[lavKey(l.titolo)]=1});
+      (r.lavori||[]).forEach(function(l){var k=lavKey(l.titolo);if(!k||have[k])return;have[k]=1;n++;LAV.push({titolo:l.titolo,tipo:l.tipo||"Altro",minuti:l.minuti||null,esterno:l.esterno||"",nota:l.nota||"",stato:"proposto",fonte:l.fonte||"manuale"})});
+      LAVMSG=(n?n+(n===1?" lavoro aggiunto":" lavori aggiunti")+". ":"Nessun lavoro nuovo. ")+(r.avviso||(own?"Controlla i tempi e approva.":"Il titolare li controllerà e approverà."));
+      LTXT="";stepLavori($("body"));return saveLav()})
+    .catch(function(e){if(!authFail(e))toast("Calcolo non riuscito: "+((e instanceof TypeError)?"connessione assente":e.message),true);var x=$("calc");if(x){x.disabled=false;x.textContent="Calcola tempi"}});
+  };
+  var L=$("lvl");
+  L.addEventListener("change",function(e){var k=e.target.dataset.k,c=e.target.closest(".lv");if(!k||!c)return;var l=LAV[+c.dataset.i];if(!l)return;
+    if(k==="minuti"){var m=tParse(e.target.value);if(m!==null&&(isNaN(m)||m<1||m>6000)){toast("Tempo non valido. Esempi: 2:30, 16, 90 min",true);e.target.value=tFmt(l.minuti);return}l.minuti=m;e.target.value=tFmt(m)}
+    else l[k]=e.target.value;
+    if(l.titolo&&l.titolo.trim())saveLav()});
+  L.addEventListener("click",function(e){var t=e.target.closest("button");if(!t)return;
+    if(t.dataset.x!=null){var l=LAV[+t.dataset.x];if(!l)return;if(l.titolo&&!confirm("Eliminare «"+l.titolo+"»?"+(l.fatto_ms?"\nCi sono già timbrature su questo lavoro: restano, ma non saranno più collegate.":"")))return;LAV.splice(+t.dataset.x,1);drawLav();saveLav();return}
+    if(t.dataset.ap!=null){var a=LAV[+t.dataset.ap];if(!a)return;if(a.stato!=="approvato"&&!a.minuti){toast("Metti prima il tempo massimo",true);return}if(!a.titolo||!a.titolo.trim()){toast("Scrivi il lavoro",true);return}a.stato=a.stato==="approvato"?"proposto":"approvato";drawLav();saveLav();return}
+    if(t.id==="apall"){var no=0;LAV.forEach(function(x){if(x.stato==="approvato"||!(x.titolo&&x.titolo.trim()))return;if(x.minuti)x.stato="approvato";else no++});if(no)toast(no+(no===1?" lavoro senza tempo: non approvato":" lavori senza tempo: non approvati"),true);drawLav();saveLav();return}
+    if(t.id==="add1"){LAV.push({titolo:"",tipo:"Altro",minuti:null,esterno:"",nota:"",stato:"proposto",fonte:"manuale"});drawLav();var ins=L.querySelectorAll('[data-k="titolo"]');if(ins.length)ins[ins.length-1].focus()}
+  });
+}
+
+/* ---------- tempario (titolare) ---------- */
+function viewTempario(){
+  $("app").innerHTML='<header><button class="btn" id="bk">← Elenco</button><h1>Tempario</h1></header><div class="card mu sm">Tempi massimi per motore e lavoro. Si aggiornano da soli quando approvi un lavoro con un tempo; qui puoi correggerli o eliminarli. «Tutti i motori» sono i tempi fissi.</div><div id="tpl"><div class="mu">Caricamento…</div></div>';
+  $("bk").onclick=viewList;
+  var T=[];
+  var fill=function(){rpc("acc_tempario",A({})).then(function(r){T=r;var g={};r.forEach(function(x){var gk=x.motore_key==="*"?"Tutti i motori":x.motore;(g[gk]=g[gk]||[]).push(x)});
+    $("tpl").innerHTML=Object.keys(g).map(function(m){return'<div class="card"><b>'+h(m)+'</b>'+g[m].map(function(x){var i=T.indexOf(x);
+      return'<div class="ck"><div class="nm">'+h(x.lavoro)+(x.esterno?'<div class="mu sm">Esterno: '+h(x.esterno)+'</div>':'')+(x.note?'<div class="mu sm">'+h(x.note)+'</div>':'')+'</div>'+
+      '<div style="display:flex;gap:8px;align-items:center"><input class="f" data-tm="'+i+'" value="'+tFmt(x.minuti)+'" inputmode="decimal" style="width:96px;min-height:44px;text-align:center;font-weight:800" aria-label="Tempo">'+
+      (x.motore_key==="*"?'':'<button class="btn del" data-td="'+i+'" aria-label="Elimina">✕</button>')+'</div></div>'}).join("")+'</div>'}).join("")||'<div class="card mu">Tempario vuoto.</div>'}).catch(function(e){if(!authFail(e))toast(e.message,true)})};
+  fill();
+  $("tpl").onchange=function(e){var i=e.target.dataset.tm;if(i==null)return;var x=T[+i],m=tParse(e.target.value);if(!m||isNaN(m)||m<1||m>6000){toast("Tempo non valido. Esempi: 2:30, 16, 90 min",true);e.target.value=tFmt(x.minuti);return}
+    rpc("acc_tempario_set",{p_o:S.p,p_id:x.id,p_minuti:m,p_esterno:x.esterno||"",p_note:x.note||""}).then(function(){toast("Tempo aggiornato");fill()}).catch(function(e2){toast(e2.message,true)})};
+  $("tpl").onclick=function(e){var i=e.target.dataset.td;if(i==null)return;var x=T[+i];if(!confirm("Eliminare «"+x.lavoro+"» per "+x.motore+"?"))return;
+    rpc("acc_tempario_set",{p_o:S.p,p_id:x.id,p_minuti:null,p_esterno:"",p_note:""}).then(fill).catch(function(e2){toast(e2.message,true)})};
 }
 
 /* --- stampa --- */
