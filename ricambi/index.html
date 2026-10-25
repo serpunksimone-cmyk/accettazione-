@@ -170,7 +170,7 @@ function view(){
 }
 
 /* ---------- richiesta: nuova / modifica / ricerca codice ---------- */
-function urlFor(f,q){return f.url?f.url.replace(/\{q\}/g,encodeURIComponent(q)):null}
+function urlFor(f,q,t,v){return f.url?f.url.replace(/\{q\}/g,encodeURIComponent(q||"")).replace(/\{targa\}/gi,encodeURIComponent(t||"")).replace(/\{telaio\}/gi,encodeURIComponent(v||"")):null}
 function editor(id){
   var r=id?R.filter(function(x){return x.id===id})[0]:null;
   var isNew=!r;r=r||{stato:"da_cercare",qta:1};
@@ -200,7 +200,7 @@ function editor(id){
   };
   var buildSup=function(){
     var q=$("sq").value.trim();
-    var bt=F.filter(function(f){return f.url}).map(function(f){return'<button class="btn" data-u="'+h(urlFor(f,q||auto()||$("ds").value))+'" title="'+h(f.note||"")+'">'+h(f.nome)+' ↗</button>'}).join("");
+    var bt=F.filter(function(f){return f.url}).map(function(f){return'<button class="btn" data-u="'+h(urlFor(f,q||auto()||$("ds").value,(r.targa||($("tg")&&$("tg").value)||"").trim().toUpperCase(),r.telaio||""))+'" title="'+h(f.note||"")+'">'+h(f.nome)+' ↗</button>'}).join("");
     var g=(q||(($("ds").value+" "+auto()).trim()));
     $("sup").innerHTML=bt+'<button class="btn" data-u="https://www.google.com/search?q='+encodeURIComponent(g+" codice ricambio")+'">Google ↗</button><button class="btn" data-u="https://www.google.com/search?tbm=isch&q='+encodeURIComponent(g+" ricambio")+'">Immagini ↗</button>'+
       (F.length?'':'<span class="sm mu">Aggiungi i tuoi fornitori da "Fornitori" per avere qui i collegamenti diretti.</span>');
@@ -240,7 +240,7 @@ function fornitori(){
   var ov=document.createElement("div");ov.className="ov";
   var draw=function(){
     ov.innerHTML='<div class="sheet"><div style="display:flex;justify-content:space-between;align-items:center"><h1>Fornitori</h1><button class="btn" id="x">Chiudi</button></div>'+
-      '<p class="sm mu">Per avere un pulsante di ricerca diretta, incolla l\'indirizzo della pagina di ricerca del fornitore e al posto del termine cercato scrivi <b>{q}</b>.<br>Esempio: <span class="cod">https://www.sito.it/cerca?q={q}</span>. Per trovare l\'indirizzo: cerca una cosa qualsiasi sul sito e copia l\'indirizzo dalla barra del browser, poi sostituisci quello che hai cercato con {q}.</p>'+
+      '<p class="sm mu">Per avere un pulsante di ricerca diretta, incolla l\'indirizzo della pagina di ricerca del fornitore e al posto del termine cercato scrivi <b>{q}</b>; se il sito cerca per targa scrivi <b>{targa}</b> (oppure <b>{telaio}</b>), così il pulsante apre la ricerca già compilata con la targa dell\'auto.<br>Esempio: <span class="cod">https://www.sito.it/cerca?q={q}</span>. Per trovare l\'indirizzo: cerca una cosa qualsiasi sul sito e copia l\'indirizzo dalla barra del browser, poi sostituisci quello che hai cercato con {q}.</p>'+
       (F.length?F.map(function(f){return'<div class="card"><div class="row r2"><div><label>Nome</label><input class="f" data-k="nome" data-id="'+f.id+'" value="'+h(f.nome)+'"></div><div><label>Indirizzo di ricerca (con {q})</label><input class="f" data-k="url" data-id="'+f.id+'" value="'+h(f.url||"")+'"></div></div>'+
         '<div style="display:flex;gap:8px;margin-top:10px"><button class="btn" data-sv="'+f.id+'">Salva</button><button class="btn" data-off="'+f.id+'">Rimuovi</button></div></div>'}).join(""):'<div class="card mu">Nessun fornitore ancora.</div>')+
       '<h2>Aggiungi fornitore</h2><div class="card"><div class="row r2"><div><label>Nome</label><input class="f" id="nn"></div><div><label>Indirizzo di ricerca (con {q})</label><input class="f" id="nu" placeholder="https://…{q}"></div></div><div style="margin-top:10px"><button class="b" id="na">Aggiungi</button></div></div><div class="msg" id="fm"></div></div>';
@@ -252,7 +252,7 @@ function fornitori(){
       if(o&&confirm("Rimuovere questo fornitore dall'elenco?"))save({id:o.dataset.off,nome:g(o.dataset.off,"nome"),url:g(o.dataset.off,"url"),attivo:false})};
   };
   var save=function(f){
-    if(f.url&&f.url.indexOf("{q}")<0&&!confirm("Nell'indirizzo manca {q}: il pulsante aprirà sempre la stessa pagina. Salvare lo stesso?"))return;
+    if(f.url&&!/\{(q|targa|telaio)\}/i.test(f.url)&&!confirm("Nell'indirizzo manca {q} (o {targa}): il pulsante aprirà sempre la stessa pagina. Salvare lo stesso?"))return;
     rpc("ric_forn_save",A({p_f:f})).then(function(){return rpc("ric_forn_list",A({}))}).then(function(l){F=l||[];draw();toast("Salvato")}).catch(function(e){if(!authFail(e))$("fm").textContent=e.message});
   };
   document.body.appendChild(ov);draw();
