@@ -399,19 +399,56 @@ function stepFoto(b){
     return'<button class="ft'+(f?" has":"")+'" data-slot="'+slot+'" data-label="'+h(label)+'"'+(u?' style="background-image:url(\''+h(u)+'\')"':'')+'>'+
       (f?(list.length>1?'<span class="cnt">'+list.length+'</span>':'')+'<span class="lb">'+h(label)+' ✓</span>':'<span class="ic">📷</span>'+h(label))+'</button>'};
   var extra=D.foto.filter(function(f){return!SLOTS.some(function(s){return s[0]===f.slot})});
-  b.innerHTML='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Giro dell\'auto: '+done+' / '+SLOTS.length+'</b><span class="mu sm">Tocca un riquadro per scattare</span></div></div>'+
+  b.innerHTML='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>Giro dell\'auto: '+done+' / '+SLOTS.length+'</b><span class="mu sm">Tocca un riquadro per scattare</span></div>'+(D.foto.length?'<button class="b ac" data-all="1" style="width:100%;margin-top:10px">Salva tutto in Foto</button>':'')+'</div>'+
     '<div class="fg">'+SLOTS.map(function(s){return tile(s[0],s[1],bySlot[s[0]])}).join("")+
     (UPS?'<div class="ft up"><div class="spin"></div>Invio '+UPS+'…</div>':'')+'</div>'+
     '<h2>Altre foto ('+extra.length+')</h2><div class="fg">'+extra.map(function(f){var u=URLS[f.path];return'<button class="ft has" data-view="'+h(f.path)+'"'+(u?' style="background-image:url(\''+h(u)+'\')"':'')+'><span class="lb">'+h(f.label||"Extra")+'</span></button>'}).join("")+
     '<button class="ft" data-slot="extra" data-label="Extra"><span class="ic">＋</span>Scatta altra foto</button><button class="ft" data-gal="1"><span class="ic">🖼</span>Dalla galleria</button></div>';
   b.onclick=function(e){
-    var t=e.target.closest("[data-slot],[data-view],[data-gal]");if(!t)return;
+    var t=e.target.closest("[data-slot],[data-view],[data-gal],[data-all]");if(!t)return;
+    if(t.dataset.all){saveAll();return}
     if(t.dataset.view){viewFoto(t.dataset.view);return}
     if(t.dataset.gal){SLOT_PICK={slot:"extra",label:"Extra"};$("gal").click();return}
     var has=D.foto.filter(function(f){return f.slot===t.dataset.slot});
     if(has.length&&t.dataset.slot!=="extra"){fotoMenu(t.dataset.slot,t.dataset.label,has);return}
     shoot(t.dataset.slot,t.dataset.label);
   };
+}
+function saveAll(){
+  var list=D.foto.filter(function(f){return URLS[f.path]});
+  if(!list.length){toast("Nessuna foto da salvare",true);return}
+  toast("Preparo l'immagine…");
+  var cols=3,cw=640,ch=480,cap=44,gap=8,top=70;
+  var rows=Math.ceil(list.length/cols),W=cols*cw+(cols+1)*gap,H=top+rows*(ch+cap+gap)+gap;
+  var k=Math.min(1,Math.sqrt(12e6/(W*H)));
+  var cv=document.createElement("canvas");cv.width=Math.round(W*k);cv.height=Math.round(H*k);
+  var x=cv.getContext("2d");x.scale(k,k);x.fillStyle="#fff";x.fillRect(0,0,W,H);
+  x.fillStyle="#111";x.font="bold 34px system-ui,sans-serif";x.textBaseline="middle";
+  x.fillText("Scheda N° "+(D.num||"")+" · "+(D.targa||"")+" "+((D.marca||"")+" "+(D.modello||"")).trim(),gap+8,top/2);
+  var ld=function(f){return new Promise(function(ok){var im=new Image();im.onload=function(){ok(im)};im.onerror=function(){ok(null)};im.src=URLS[f.path]})};
+  Promise.all(list.map(ld)).then(function(ims){
+    ims.forEach(function(im,i){
+      var cx=gap+(i%cols)*(cw+gap),cy=top+Math.floor(i/cols)*(ch+cap+gap);
+      x.fillStyle="#eee";x.fillRect(cx,cy,cw,ch);
+      if(im){var r=Math.min(cw/im.width,ch/im.height),w=im.width*r,hh=im.height*r;x.drawImage(im,cx+(cw-w)/2,cy+(ch-hh)/2,w,hh)}
+      x.fillStyle="#111";x.font="bold 26px system-ui,sans-serif";x.fillText(list[i].label||list[i].slot||"Foto",cx+4,cy+ch+cap/2);
+    });
+    cv.toBlob(function(bl){
+      if(!bl){toast("Immagine non creata (troppe foto?)",true);return}
+      var fname=("Scheda-"+(D.num||"")+"_"+(D.targa||"foto")).replace(/[^A-Za-z0-9_-]+/g,"-")+".jpg";
+      var FILE=new File([bl],fname,{type:"image/jpeg"}),u=URL.createObjectURL(bl);
+      var ov=document.createElement("div");ov.className="ov full";
+      ov.innerHTML='<img src="'+u+'" alt=""><div class="mu sm">'+list.length+' foto in un\'unica immagine</div>'+
+        '<button class="b ac" id="as" style="width:100%;max-width:500px">Salva nell\'app Foto</button><button class="b gh" id="ac2" style="width:100%;max-width:500px">Chiudi</button>';
+      document.body.appendChild(ov);
+      ov.querySelector("#ac2").onclick=function(){ov.remove();URL.revokeObjectURL(u)};
+      ov.querySelector("#as").onclick=function(){
+        if(navigator.canShare&&navigator.canShare({files:[FILE]})){
+          navigator.share({files:[FILE]}).catch(function(e){if(e&&e.name!=="AbortError")toast("Salvataggio non riuscito: "+(e.message||e.name),true)});
+        }else{var a=document.createElement("a");a.href=u;a.download=fname;document.body.appendChild(a);a.click();a.remove();toast("Immagine scaricata nei file del tablet")}
+      };
+    },"image/jpeg",.88);
+  }).catch(function(e){toast("Errore: "+((e&&e.message)||e),true)});
 }
 function shoot(slot,label,cb,start){SLOT_PICK={slot:slot,label:label,cb:cb,start:start};var c=$("cam");c.value="";c.click()}
 function fotoMenu(slot,label,list){
